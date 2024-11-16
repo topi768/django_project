@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from rest_framework import viewsets
 from .models import Item
 from .serializers import ItemSerializer
 from rest_framework.decorators import api_view
-
+from rest_framework.response import Response
+from rest_framework import status
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
@@ -34,12 +35,27 @@ def get_item_by_id(request, item_id):
 # POST endpoint для создания нового объекта
 @api_view(['POST'])
 def create_item(request):
-    print(request)
     serializer = ItemSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST', 'GET'])
+def items_view_universal(request):
+    if request.method =='GET':
+        items = Item.objects.all()
+        serializer = ItemSerializer(items, many=True)
+        return   Response(serializer.data, status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return redirect('/items')
+            # return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def home(request):
     return HttpResponse("Hello, home!")
