@@ -8,11 +8,21 @@ from .serializers import ItemSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
+class Index(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+
+    def get(self, request):
+        content = {'message': 'Hello, World!'}
+        return Response(content)
 
 
 # GET endpoint для получения всех объектов
@@ -64,4 +74,12 @@ def home(request):
 def say_hallo(request):
     return render(request, "hello.html", {'name': 'vasya'})
 
-
+#
+# import requests
+#
+# url = 'http://127.0.0.1:8000/token/'
+#
+# r = requests.get(url, headers={
+#   'Authorization': 'Token 76b8487f98a50da9f0e800e38b286ec6460feba8'
+#   }
+# )
