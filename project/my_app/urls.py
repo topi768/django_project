@@ -24,5 +24,13 @@ urlpatterns = [
     # path('token/', obtain_auth_token),
     path('api/drf-auth/', include("rest_framework.urls")),
 
+    # CRUD USER
+    path('user/user_list/', views.user_list, name='user_list'),
+    path('user/get_user_by_id/<int:user_id>', views.get_user_by_id, name='get_user_by_id'),
+    path('user/update_user/<int:user_id>', views.update_user, name='update_user'),
+    path('user/create_user/', views.create_user, name='create_user'),
+    path('user/partial_update_user/<int:user_id>', views.partial_update_user, name='partial_update_user'),
+    path('user/delete_user/<int:user_id>', views.delete_user, name='delete_user'),
+
 ]
 

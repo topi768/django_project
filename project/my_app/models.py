@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class Room(models.Model):
@@ -18,3 +19,7 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+
+class User(AbstractUser):
+    class Meta(AbstractUser.Meta):
+        swappable = "AUTH_USER_MODEL"
