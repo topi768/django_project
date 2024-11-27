@@ -28,8 +28,9 @@ class Index(APIView):
         content = {'message': 'Hello, World!'}
         return Response(content)
 
+
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_all_items(request):
     items = Item.objects.all()
     serializer = ItemSerializer(items, many=True)

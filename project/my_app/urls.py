@@ -32,5 +32,6 @@ urlpatterns = [
     path('user/partial_update_user/<int:user_id>', views.partial_update_user, name='partial_update_user'),
     path('user/delete_user/<int:user_id>', views.delete_user, name='delete_user'),
 
+
 ]
 
