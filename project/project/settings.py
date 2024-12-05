@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-($p=4dtpm9*1gk!-0r*dqs96*#ojuic#wgs4t+l)z)hl(0_dq1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["10.193.150.90", "localhost", "127.0.0.1"]
+# ALLOWED_HOSTS = ["192.168.1.100", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'my_app'
+    'corsheaders',
+    'my_app',
+
     # rest_framework 
 ]
 REST_FRAMEWORK = {
@@ -47,15 +49,19 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        # раньше стояла
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+
     ],
     # html интерфейс drf
     # 'DEFAULT_RENDERER_CLASSES': [
     #     'rest_framework.renderers.JSONRenderer',
     # ]
 }
-
+# CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +70,25 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False
+
+# Настройки CORS
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:5173"
+]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_AGE = 3600  # 1 час
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False  # Установите True, если используете HTTPS
 
 ROOT_URLCONF = 'project.urls'
 

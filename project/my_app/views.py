@@ -16,6 +16,8 @@ from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.contrib.auth import authenticate, login
+
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -141,3 +143,43 @@ def delete_user(request, user_id):
 
     user.delete()
     return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def register(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    email = request.data.get('email')
+    if User.objects.filter(username=username).exists():
+        return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.create_user(username=username, password=password, email=email)
+    return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def login_user(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    if not User.objects.filter(username=username).exists():
+        return Response({"error": 'user not exists'}, status=status.HTTP_404_NOT_FOUND)
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return Response({"message": "Logged in successfully."}, status=status.HTTP_200_OK)
+    else:
+        return Response({"error": "Invalid username or password."}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def profile(request):
+    print("Received cookies:", request.COOKIES)
+    print("User:", request.user)
+
+    if request.user.is_authenticated:
+        return Response({
+            "username": request.user.username,
+            "email": request.user.email
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({
+            "error": "User is not authenticated"
+        }, status=status.HTTP_401_UNAUTHORIZED)
