@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import api from "../api/auth";
 
 const Profile = () => {
-  const [profile, setProfile] = useState({ username: "", email: "" });
+  const [profile, setProfile] = useState({ username: "", email: "", first_name: "", last_name: ""});
 
   useEffect(() => {
+
     const fetchProfile = async () => {
       try {
         const { data } = await api.get("profile/");
-        console.log(data);
         
         setProfile(data);
       } catch (err) {
@@ -20,32 +20,72 @@ const Profile = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
+    console.log(profile);
+    
   };
 
   const handleUpdate = async () => {
     try {
-      await api.put("profile/", profile);
-      alert("Profile updated!");
+      // Получаем CSRF-токен из куки
+      const getCookie = (name: string): string | null => {
+        const cookies = document.cookie.split("; ");
+        for (const cookie of cookies) {
+          const [key, value] = cookie.split("=");
+          if (key === name) {
+            return decodeURIComponent(value);
+          }
+        }
+        return null;
+      };
+  
+      const csrfToken = getCookie("csrftoken");
+      console.log( document.cookie);
+      
+      // if (!csrfToken) {
+      //   console.error("CSRF token not found.");
+      //   return;
+      // }
+  
+      // Логирование для проверки
+      console.log("CSRF Token:", csrfToken);
+      console.log("Authorization Header:", api.defaults.headers.common["Authorization"]);
+  
+      // // Отправка запроса с CSRF-токеном в заголовке
+      await api.put(
+        "profile/",
+        profile,
+        {
+          headers: {
+            "X-CSRFToken": "cAt9L7xdabH0rBIKqZd3WEixFfFMgMXd", // Добавляем токен в заголовок
+          },
+          withCredentials: true, // Включаем отправку cookies
+        }
+      );
     } catch (err) {
       console.error(err);
     }
-  };
-
+  }
+  const handlePasswordReset = async () => {
+    
+  }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      {/* <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-bold text-center mb-6">Profile</h2>
-        <p className="text-sm text-gray-600 mb-4" >Change username</p>
+        <h3 className="text-lg font-bold text-center mb-4">Username: {profile.username}</h3>
+        <p className="text-sm text-gray-600 mb-4" >Change firstname</p>
         <input
-          name="username"
-          value={profile.username}
+          name="first_name"
+          value={profile.first_name}
           onChange={handleChange}
           className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           
         />
+        <p className="text-sm text-gray-600 mb-4" >Change lastname</p>
+
         <input
-          name="password"
-          value={profile.email}
+          name="last_name"
+          value={profile.last_name}
           onChange={handleChange}
           className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -55,7 +95,13 @@ const Profile = () => {
         >
           Update Profile
         </button>
-      </div> */}
+        <button
+          onClick={handlePasswordReset}
+          className="w-full bg-red-500 mt-4 text-white p-2 rounded-md hover:bg-blue-600"
+        >
+          Сброс пароля
+        </button>
+      </div>
     </div>
   );
 };
