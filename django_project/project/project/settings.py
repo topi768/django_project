@@ -196,10 +196,11 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 
 
 EMAIL_BACKEND: 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.com'
+EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'topi768@inbox.ru'
 EMAIL_HOST_PASSWORD = 'M4QusKW2ZT9Pw7uT2437'
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'topi768@inbox.ru'
 
 AUTH_USER_MODEL = 'my_app.UserAccount'
