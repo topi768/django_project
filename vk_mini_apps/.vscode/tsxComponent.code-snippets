@@ -1,0 +1,21 @@
+{
+  "React Functional Component": {
+    "prefix": "vkPanel",
+    "body": [
+      "import React from 'react';",
+      "",
+      "interface ${1:}Props {}",
+      "",
+      "export const ${1:ComponentName}: React.FC<${1}Props> = () => {",
+      "  return (",
+      "    <div>",
+      "      {/* Содержимое компонента */}",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+    ],
+    "description": "create vk panel",
+    "scope": "typescriptreact",
+  },
+}

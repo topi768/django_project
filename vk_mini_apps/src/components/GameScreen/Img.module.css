@@ -1,0 +1,28 @@
+@keyframes slideIn {
+  0% {
+    transform: translateY(30%) translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0%) translateX(100%);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.imgFind {
+  animation: slideIn 0.4s ease-out forwards;
+}
+.square {
+  animation: fadeIn 0.4s ease-out forwards;
+  border-radius: 5px;
+  border: 2px #ffffff;
+}
