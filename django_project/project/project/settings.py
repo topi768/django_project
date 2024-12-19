@@ -9,14 +9,22 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+<<<<<<< HEAD
 
+=======
+from pathlib import Path
+>>>>>>> new-branch
 import os
 from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+<<<<<<< HEAD
 
 
+=======
+print(BASE_DIR)
+>>>>>>> new-branch
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -32,6 +40,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+<<<<<<< HEAD
+=======
+    # 'new_app',
+>>>>>>> new-branch
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,16 +51,31 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+<<<<<<< HEAD
     'djoser',
     'my_app',
     'social_django',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist'
+=======
+
+    'new_app',
+    'project',
+    'djoser',
+    # 'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
+
+>>>>>>> new-branch
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+<<<<<<< HEAD
     'social_django.middleware.SocialAuthExceptionMiddleware',
+=======
+    # 'social_django.middleware.SocialAuthExceptionMiddleware',
+>>>>>>> new-branch
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,7 +86,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'project.urls'
+<<<<<<< HEAD
 print(BASE_DIR)
+=======
+>>>>>>> new-branch
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -71,8 +101,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+<<<<<<< HEAD
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect'
+=======
+                # 'social_django.context_processors.backends',
+                # 'social_django.context_processors.login_redirect'
+>>>>>>> new-branch
             ],
         },
     },
@@ -168,6 +203,7 @@ DJOSER = {
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+<<<<<<< HEAD
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
@@ -176,10 +212,26 @@ DJOSER = {
         'user_create': 'my_app.serializers.UserCreateSerializer',
         'user': 'my_app.serializers.UserCreateSerializer',
         'current_user': 'my_app.serializers.UserCreateSerializer',
+=======
+
+    # 'ACTIVATION_URL': 'activate/{uid}/{token}',
+    # 'SEND_ACTIVATION_EMAIL': True,
+
+    'ACTIVATION_URL': None,  # Убирает ссылку для активации
+    'SEND_ACTIVATION_EMAIL': False,
+
+    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000/google', 'http://localhost:8000/facebook'],
+    'SERIALIZERS': {
+        'user_create': 'new_app.serializers.UserCreateSerializer',
+        'user': 'new_app.serializers.UserCreateSerializer',
+        'current_user': 'new_app.serializers.UserCreateSerializer',
+>>>>>>> new-branch
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
     }
 }
 
+<<<<<<< HEAD
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '[YOUR GOOGLE OAUTH2 API KEY]'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '[YOUR GOOGLE OAUTH2 API SECRET]'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
@@ -191,6 +243,19 @@ SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'email, first_name, last_name'
 }
+=======
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '[YOUR GOOGLE OAUTH2 API KEY]'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '[YOUR GOOGLE OAUTH2 API SECRET]'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
+# SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
+#
+# SOCIAL_AUTH_FACEBOOK_KEY = '[YOUR FACEBOOK API KEY]'
+# SOCIAL_AUTH_FACEBOOK_SECRET = '[YOUR FACEBOOK API SECRET]'
+# SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+#     'fields': 'email, first_name, last_name'
+# }
+>>>>>>> new-branch
 
 
 
@@ -203,4 +268,8 @@ EMAIL_HOST_PASSWORD = 'M4QusKW2ZT9Pw7uT2437'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'topi768@inbox.ru'
 
+<<<<<<< HEAD
 AUTH_USER_MODEL = 'my_app.UserAccount'
+=======
+AUTH_USER_MODEL = 'new_app.UserAccount'
+>>>>>>> new-branch
