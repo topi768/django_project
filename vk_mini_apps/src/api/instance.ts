@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const instance = axios.create({
-  baseURL: "https://fc.nxt.zbc.su/",
+  baseURL: "http://127.0.0.1:8000/",
   timeout: 3000,
   headers: {
     authorization: `Bearer ${window.location.search?.replace("?", "") || ""}`,
@@ -23,6 +23,7 @@ export const apiUrls = {
   },
   appInfo: {
     user: "/api/findcat/user", //get
+    countryList: "/api/countryList", //get
   },
   game: {
     lvls: "/api/findcat/game/lvls", //get

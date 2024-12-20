@@ -18,7 +18,6 @@ export interface HomeProps extends NavIdProps {
 export const Home: FC<HomeProps> = ({ id }) => {
   const routeNavigator = useRouteNavigator();
   const { userResponse } = useUser();
-  console.log(userResponse);
   const value = {
     score: 0,
     userPosition: 0,

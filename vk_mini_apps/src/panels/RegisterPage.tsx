@@ -1,5 +1,7 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import axios from "axios";
+import { useCountryList, useCitiesList} from "../hooks/useCountryList";
+import InputMask from "react-input-mask";
 
 interface RegistrationFormData {
   email: string;
@@ -21,22 +23,37 @@ const RegistrationForm: React.FC = () => {
     city: "",
     interests: [],
     phone: "",
-    dateOfBirth: "", // Инициализация нового поля
+    dateOfBirth: "",
   });
-
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
+  const {
+    data: citiesList,
+    isLoading: isCitiesListLoading,
+  } = useCitiesList(selectedCountryCode);
+  console.log(citiesList, selectedCountryCode);
+  
+  const {
+    data: countryList,
+    isLoading: isCountryListLoading,
+  } = useCountryList();
 
-  const countries: string[] = ["США", "Канада", "Мексика"];
-  const cities: string[] = ["Нью-Йорк", "Лос-Анджелес", "Чикаго"];
+
   const interests: string[] = ["Спорт", "Музыка", "Чтение", "Путешествия"];
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
+
     const { name, value } = e.target;
+    if (name == 'country') {
+      setSelectedCountryCode(value); 
+    }
+
     setFormData({ ...formData, [name]: value });
   };
+
 
   const handleInterestsChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -47,6 +64,7 @@ const RegistrationForm: React.FC = () => {
         : prevState.interests.filter((interest) => interest !== value),
     }));
   };
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -75,7 +93,7 @@ const RegistrationForm: React.FC = () => {
       // Отправка данных на сервер
       console.log(formData);
       await axios.post("http://127.0.0.1:8000/api/register/", formData);
-      
+
       setSuccess(true);
       setTimeout(() => {
         window.location.href = `/user/${formData.email}`; // Редирект на страницу пользователя
@@ -143,11 +161,17 @@ const RegistrationForm: React.FC = () => {
               required
             >
               <option value="">Выберите страну</option>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
+
+              {isCountryListLoading ? (
+                <option>Loading...</option>
+              ) : (
+                countryList?.map((country) => (
+                  <option key={country.country_code} value={country.country_code}>
+                    {country.country_name}
+                  </option>
+                ))
+              )
+              }
             </select>
           </div>
 
@@ -162,9 +186,9 @@ const RegistrationForm: React.FC = () => {
               required
             >
               <option value="">Выберите город</option>
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
+              {citiesList?.map((city) => (
+                <option key={city.city} value={city.city}>
+                  {city.city}
                 </option>
               ))}
             </select>
@@ -190,14 +214,21 @@ const RegistrationForm: React.FC = () => {
           {/* Phone (Необязательное поле) */}
           <div className="mb-4">
             <label className="block text-gray-600 mb-2">Телефон (необязательно):</label>
-            <input
-              type="tel"
-              name="phone"
+            <InputMask
+              mask="+7 (999) 999-99-99"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="+7 (XXX) XXX-XX-XX"
-            />
+            >
+              {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => (
+                <input
+                  {...inputProps}
+                  type="tel"
+                  name="phone"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="+7 (XXX) XXX-XX-XX"
+                />
+              )}
+            </InputMask>
           </div>
 
           {/* Date of Birth (Обязательное поле) */}
