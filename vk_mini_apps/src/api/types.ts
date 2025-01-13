@@ -20,3 +20,12 @@ export interface City {
   city_code: string;
   city: string;
 }
+export interface User {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  country?: string;
+  city?: string;
+  interests?: string[];
+  phone?: string;
+}

@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 const Register = () => {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [form, setForm] = useState({ username: "", email: "", password: "" , telephone: "", country: "", city: ""});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,6 +34,12 @@ const Register = () => {
         <input
           name="username"
           placeholder="Username"
+          onChange={handleChange}
+          className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          name="telephone"
+          placeholder="telephone"
           onChange={handleChange}
           className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

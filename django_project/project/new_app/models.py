@@ -57,6 +57,11 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 from rest_framework import serializers
 
 class UserAccountInfo(models.Model):
+    user = models.OneToOneField(
+        "UserAccount",
+        on_delete=models.CASCADE,
+        related_name="info"
+    )
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     country = models.CharField(max_length=255, blank=True, null=True)  # Страна пользователя
@@ -72,25 +77,13 @@ class UserAccountInfo(models.Model):
 class CountryCodeAndCountryName(models.Model):
     country_code = models.CharField(max_length=255, blank=True, null=False)
     country_name = models.CharField(max_length=255, blank=True, null=True)
-    # country_code_number = models.BigIntegerField(blank=True, null=True, unique=True)
 
-
-    # def save(self, *args, **kwargs):
-    #     # Преобразуем символы country_code в их числовые эквиваленты
-    #     if self.country_code:
-    #         self.country_code_number = self.convert_country_code_to_number(self.country_code)
-    #     super().save(*args, **kwargs)
-
-    def convert_country_code_to_number(self, country_code):
-        # Преобразуем каждый символ в его числовой код
-        result = ''.join(str(ord(char) - ord('A') + 1).zfill(2) for char in country_code)
-        return int(result)
-
+    def __str__(self):
+        return f"{self.country_name} ({self.country_code})"
 
 class CityAndCountryCode(models.Model):
     country_code = models.CharField(max_length=255, blank=True, null=False)
     city = models.CharField(max_length=255, blank=True, null=True)
-    # country_code_number = models.BigIntegerField(blank=True, null=True)
     country = models.ForeignKey(
         "CountryCodeAndCountryName",  # Связываем с другой моделью
         on_delete=models.CASCADE,
@@ -98,28 +91,5 @@ class CityAndCountryCode(models.Model):
         blank=True,
         null=True
     )
-
-    # def save(self, *args, **kwargs):
-    #     if self.country_code:
-    #         self.country_code_number = self.convert_country_code_to_number(self.country_code)
-    #     super().save(*args, **kwargs)
-
-    def convert_country_code_to_number(self, country_code):
-        result = ''.join(str(ord(char) - ord('A') + 1).zfill(2) for char in country_code)
-        return int(result)
-
-
-    # def save(self, *args, **kwargs):
-    #     # Преобразуем символы country_code в их числовые эквиваленты
-    #     if self.country_code:
-    #         self.country_code_number = self.convert_country_code_to_number(self.country_code)
-    #     # Связываем с соответствующей записью CountryCodeAndCountryName
-    #     self.country = CountryCodeAndCountryName.objects.filter(
-    #         country_code_number=self.country_code_number
-    #     ).first()
-    #     super().save(*args, **kwargs)
-
-    def convert_country_code_to_number(self, country_code):
-        # Преобразуем каждый символ в его числовой код
-        result = ''.join(str(ord(char) - ord('A') + 1).zfill(2) for char in country_code)
-        return int(result)
+    def __str__(self):
+        return f"{self.country_code} ({self.city})"

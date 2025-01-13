@@ -1,4 +1,4 @@
-import re
+# import re
 from django.core.management.base import BaseCommand
 from new_app.models import CountryCodeAndCountryName
 
@@ -34,8 +34,10 @@ class Command(BaseCommand):
                         break
 
                     parts = line.split(' ')
-                    code = parts[0]
-                    name = parts[1].replace('\n', "")
+                    code = line[0:2]
+                    name = line[2:].replace('\n', "")
+
+
 
                     CountryCodeAndCountryName.objects.create(
                         country_code=code,

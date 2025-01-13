@@ -2,28 +2,30 @@ import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import axios from "axios";
 import { useCountryList, useCitiesList} from "../hooks/useCountryList";
 import InputMask from "react-input-mask";
-
+import { useCreateUser } from "../hooks/useUser";
 interface RegistrationFormData {
   email: string;
+  name: string;
   password: string;
-  confirmPassword: string;
+  re_password: string;
   country: string;
   city: string;
-  interests: string[]; // "Многие ко многим"
+  // interests: string[]; // "Многие ко многим"
   phone?: string; // Необязательное поле
-  dateOfBirth?: string; // Добавляем поле для даты рождения
+  date_of_birth?: string; // Добавляем поле для даты рождения
 }
 
 const RegistrationForm: React.FC = () => {
   const [formData, setFormData] = useState<RegistrationFormData>({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    country: "",
-    city: "",
-    interests: [],
-    phone: "",
-    dateOfBirth: "",
+    email: "topi768@inbox.ru",
+    name: "KIRILL",
+    password: "1234567890Q!",
+    re_password: "1234567890Q!",
+    country: "USE",
+    city: "USE",
+    // interests: [],
+    phone: "79243271979",
+    date_of_birth: "1990-01-01"
   });
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
@@ -32,7 +34,7 @@ const RegistrationForm: React.FC = () => {
     data: citiesList,
     isLoading: isCitiesListLoading,
   } = useCitiesList(selectedCountryCode);
-  console.log(citiesList, selectedCountryCode);
+  const { mutate, isLoading, isSuccess, isError } = useCreateUser();
   
   const {
     data: countryList,
@@ -56,13 +58,13 @@ const RegistrationForm: React.FC = () => {
 
 
   const handleInterestsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      interests: checked
-        ? [...prevState.interests, value]
-        : prevState.interests.filter((interest) => interest !== value),
-    }));
+    // const { value, checked } = e.target;
+    // setFormData((prevState) => ({
+    //   ...prevState,
+    //   interests: checked
+    //     ? [...prevState.interests, value]
+    //     : prevState.interests.filter((interest) => interest !== value),
+    // }));
   };
 
 
@@ -70,7 +72,7 @@ const RegistrationForm: React.FC = () => {
     e.preventDefault();
     setError("");
     setSuccess(false);
-
+    
     // Проверка: страна должна быть выбрана
     if (!formData.country) {
       setError("Страна обязательна для заполнения.");
@@ -84,22 +86,21 @@ const RegistrationForm: React.FC = () => {
     }
 
     // Проверка: пароли должны совпадать
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.re_password) {
       setError("Пароли не совпадают.");
       return;
     }
 
     try {
       // Отправка данных на сервер
-      console.log(formData);
-      await axios.post("http://127.0.0.1:8000/api/register/", formData);
-
+      
+      mutate(formData);
       setSuccess(true);
-      setTimeout(() => {
-        window.location.href = `/user/${formData.email}`; // Редирект на страницу пользователя
-      }, 1000);
+
     } catch (err: any) {
       setError("Регистрация не удалась. Пожалуйста, попробуйте снова.");
+      console.log(err);
+      
     }
   };
 
@@ -141,8 +142,8 @@ const RegistrationForm: React.FC = () => {
             <label className="block text-gray-600 mb-2">Повторите пароль:</label>
             <input
               type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              name="re_password"
+              value={formData.re_password}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               placeholder="Повторите ваш пароль"
@@ -166,7 +167,7 @@ const RegistrationForm: React.FC = () => {
                 <option>Loading...</option>
               ) : (
                 countryList?.map((country) => (
-                  <option key={country.country_code} value={country.country_code}>
+                  <option key={country.country_name} value={country.country_code}>
                     {country.country_name}
                   </option>
                 ))
@@ -195,7 +196,7 @@ const RegistrationForm: React.FC = () => {
           </div>
 
           {/* Interests (Многие ко многим) */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="block text-gray-600 mb-2">Интересы:</label>
             {interests.map((interest) => (
               <div key={interest} className="flex items-center mb-2">
@@ -209,7 +210,7 @@ const RegistrationForm: React.FC = () => {
                 <span>{interest}</span>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Phone (Необязательное поле) */}
           <div className="mb-4">
@@ -250,6 +251,7 @@ const RegistrationForm: React.FC = () => {
           {/* Submit Button */}
           <button
             type="submit"
+            onClick={handleSubmit}
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
           >
             Зарегистрироваться
