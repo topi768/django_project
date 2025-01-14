@@ -2,12 +2,18 @@ import tailwindcss from "tailwindcss";
 import { join } from "path";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
-
+import path from 'path';
 import alias from "@rollup/plugin-alias";
 // import viteBasicSslPlugin from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
+
   css: {
     postcss: {
       plugins: [tailwindcss()],

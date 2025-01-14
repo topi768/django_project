@@ -20,12 +20,15 @@ export interface City {
   city_code: string;
   city: string;
 }
-export interface User {
+
+export interface RegistrationFormData {
   email: string;
+  name: string;
   password: string;
-  confirmPassword: string;
-  country?: string;
-  city?: string;
-  interests?: string[];
+  re_password: string;
+  country: string;
+  city: string;
   phone?: string;
+  date_of_birth?: string;
+  interests?: string[];
 }

@@ -6,7 +6,7 @@ import { Spacing } from "../components/ui/Spacing";
 // import MediumButton from "../components/ui/buttons/MediumButton";
 import { useGetRatingTop5 } from "../hooks/useGetTop5";
 import { Avatar } from "../components/Avatar";
-import { RatingTop5Item } from "../api/types";
+import { RatingTop5Item } from "../types";
 import { Footer } from "../components/Footer";
 
 export interface ScoreListProps extends NavIdProps {

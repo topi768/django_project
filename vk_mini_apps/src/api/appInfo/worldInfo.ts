@@ -1,5 +1,5 @@
 import { apiUrls, instance } from "../instance";
-import { Country, City } from '../types';
+import { Country, City } from '../../types';
 
 
 export const fetchCountryList = async (): Promise<Country[]>  => {

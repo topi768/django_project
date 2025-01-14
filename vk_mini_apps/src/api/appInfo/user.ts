@@ -6,7 +6,6 @@ export const getUserFetcher = async () => {
   return response.data;
 };
 export const createUserFetcher = async (userData) => {
-  console.log(userData);
   const response = await instance.post('/auth/users/', userData);
   
   return response.data;
