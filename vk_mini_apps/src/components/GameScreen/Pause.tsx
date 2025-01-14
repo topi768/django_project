@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { LargeButton } from "../ui/buttons/LargeButton";
 import SleepCat from "@/assets/GameScreen/sleepCat.svg";
 import { useRouteNavigator } from "@vkontakte/vk-mini-apps-router";
-
+import { useNavigate } from "react-router-dom";
 const portal = document.getElementById("portal")!;
 
 interface PauseModalProps {
@@ -13,9 +13,9 @@ interface PauseModalProps {
 
 export const PauseModal: React.FC<PauseModalProps> = ({ isOpen, onClose }) => {
   const routeNavigator = useRouteNavigator();
-
+  const navigate = useNavigate();
   const onExit = () => {
-    routeNavigator.push("/");
+    navigate("/");
   };
 
   if (isOpen) {
