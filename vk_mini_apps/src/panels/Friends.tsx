@@ -7,7 +7,7 @@ import MediumButton from "../components/ui/buttons/MediumButton";
 import ChevronRight from "@/assets/icons/chevronRight.svg";
 import { useRouteNavigator } from "@vkontakte/vk-mini-apps-router";
 import { Footer } from "../components/Footer";
-
+import { useNavigate } from "react-router-dom";
 export interface FriendsProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
@@ -19,7 +19,7 @@ export const Friends: FC<FriendsProps> = ({ id }) => {
     rank: string;
     id: number;
   }
-
+  const navigate = useNavigate();
   const [friendsList] = useState<Friend[]>([
     {
       name: "Владимир Котов",
@@ -40,10 +40,9 @@ export const Friends: FC<FriendsProps> = ({ id }) => {
       id: 3,
     },
   ]);
-  const routeNavigator = useRouteNavigator();
 
   const openFriend = (id: number) => {
-    routeNavigator.push(`/friend/${id}`);
+    navigate(`/friend/${id}`);
   };
 
   return (

@@ -10,6 +10,8 @@ import IconScore from "@/assets/icons/score.svg";
 import IconTimer from "@/assets/icons/timerBlack.svg";
 import { usePlayerStore } from "../../store";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 const portal = document.getElementById("portal")!;
 interface ResultsProps {
   isOpen: boolean;
@@ -28,12 +30,14 @@ export const Results: React.FC<ResultsProps> = ({
   onClose,
   OnRepeatGame,
 }) => {
+  const navigate = useNavigate()
   const rang = usePlayerStore((state) => state.rang);
 
   const routeNavigator = useRouteNavigator();
 
   const onExit = () => {
-    routeNavigator.push("/");
+
+    navigate("/");
     onClose();
   };
 

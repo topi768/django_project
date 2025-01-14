@@ -10,12 +10,14 @@ import { Footer } from "../components/Footer";
 import { TimerReverse } from "../components/TimerReverse";
 import { ListItem } from "../components/ui/ListItem";
 import { useUser } from "../hooks/useUser.ts";
+import { useNavigate } from "react-router-dom"; // Используем useNavigate из react-router-dom
 
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
 
 export const Home: FC<HomeProps> = ({ id }) => {
+  const navigate = useNavigate();
   const routeNavigator = useRouteNavigator();
   const { userResponse } = useUser();
   const value = {
@@ -88,7 +90,7 @@ export const Home: FC<HomeProps> = ({ id }) => {
               <LargeButton
                 className=""
                 text={"Играть за 10 кис-кисов"}
-                onClick={() => routeNavigator.push("/gameScreen")}
+                onClick={() => navigate("/GameScreen")}
               />
               <div className="flex justify-center text-primary">
                 <p>или через </p>
