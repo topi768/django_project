@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getUserFetcher, createUserFetcher } from "../api/appInfo/user";
-import {RegistrationFormData} from "@/types";
+import { getUserFetcher, createUserFetcher, authTokenFetcher } from "../api/appInfo/user";
+import {RegistrationFormData, UserDataForToken} from "@/types";
 import { useState } from "react";
 
 export const useUser = () => {
@@ -9,9 +9,6 @@ export const useUser = () => {
     queryFn: async () => await getUserFetcher(),
     retry: 3,
     staleTime: 1000 * 60 * 5,
-    // refetchOnWindowFocus: false,
-    // refetchOnMount: true,
-    // refetchOnReconnect: true,
   });
 
   return {
@@ -24,12 +21,12 @@ export const useCreateUser = () => {
   const mutation = useMutation({
     mutationFn: async (formData: RegistrationFormData) => {
       try {
-        const result = await createUserFetcher(formData);
+        const result = await createUserFetcher(formData); // Предполагается, что этот фетчер возвращает данные о созданном пользователе
         return result;
       } catch (error: any) {
         if (error.response) {
           console.error("Response error:", error.response.data);
-          // Устанавливаем ошибку в состояние
+          // Устанавливаем ошибку в локальное состояние
           setErrorMessage(error.response.data || 'Unknown error');
           throw {
             message: error.message,
@@ -42,11 +39,32 @@ export const useCreateUser = () => {
         }
       }
     },
-    retry: 1,
+    retry: 1, // Ограничение на количество повторных попыток
   });
 
+  // Возвращаем мутацию вместе с состоянием ошибки
   return {
     ...mutation,
     errorMessage,
   };
+};
+
+// Хук для создания токена
+export const useCreateUserToken = () => {
+  return useMutation({
+    mutationFn: async (userData: UserDataForToken) => {
+      if (!userData) {
+        throw new Error("No data provided");
+      }
+
+      try {
+        const result = await authTokenFetcher(userData);
+        return result; // Возвращаем результат, который станет доступным в `mutateAsync`
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+    retry: 3,
+  });
 };

@@ -1,102 +1,105 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
 import { useCountryList, useCitiesList } from "../hooks/useCountryList";
-import InputMask from "react-input-mask";
-import { useCreateUser } from "../hooks/useUser";
-import InputField from "@/components/ui/InputField"; // Импортируем компонент для полей
-import {RegistrationFormData} from "@/types";
-
+import { useCreateUser, useCreateUserToken } from "../hooks/useUser";
+import InputField from "@/components/ui/InputField";
+import { RegistrationFormData } from "@/types";
+import {useAuthStore} from '@/store/authSrote'
+import { useNavigate } from "react-router-dom";
 
 const RegistrationForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { isAuth, setAuth } = useAuthStore.getState();
   const [formData, setFormData] = useState<RegistrationFormData>({
-    email: "topi768@inbox.ru",
-    name: "KIRILL",
+    email: "",
+    name: "",
     password: "1234567890Q!",
     re_password: "1234567890Q!",
-    country: "USE",
-    city: "USE",
+    country: "",
+    city: "",
     phone: "",
     date_of_birth: "",
   });
 
-  const { data: countryList, isLoading: isCountryListLoading } = useCountryList();
-  const { data: citiesList, isLoading: isCitiesListLoading } = useCitiesList(formData.country);
-  const { mutate, isLoading, isSuccess, isError, error  } = useCreateUser(); 
+  const { data: countryList } = useCountryList();
+  const { data: citiesList } = useCitiesList(formData.country);
+  const [isRegistering, setIsRegistering] = useState(false);
+  // Переносим вызов хука на уровень компонента
+  const { 
+  mutate: registerUser, 
+} = useCreateUser();
+
+const { 
+  mutateAsync: createToken,
+  isLoading: isTokenCreating
+} = useCreateUserToken();
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    console.log(e.target);
-    
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
-    let causesError: string[] | undefined;
-  
-    await mutate(formData, {
-      onSuccess: () => {
-        console.log("Registration successful!");
+    setIsRegistering(true);
+    
+    registerUser(formData, {
+      onSuccess: async () => {
+        setIsRegistering(false);
+        console.log('Registration successful!');
+
+        try {
+          const tokenData = await createToken(formData);
+          const accessToken = tokenData.access;
+          const refreshToken = tokenData.refresh;
+
+          
+          sessionStorage.setItem('accessToken', accessToken);
+          document.cookie = `refreshToken=${refreshToken}; path=/; secure; httpOnly;`
+
+          setAuth(true);
+          navigate('/home');
+
+          
+        } catch (error) {
+          console.error('Error creating token:', error);
+        }
+        setErrorMessage(null);
       },
+
       onError: (error: any) => {
-        // Извлечение сообщений об ошибке
+        setIsRegistering(false);
         
-        if (error.response && error.response) {
-          causesError = Object.keys(error.response); // Например, ["email", "password"]
-          console.log("Error causes:", causesError[0]);
-          switch (causesError[0]) {
-            case "email":
-              
+        if (error.response) {
+          const errorField = Object.keys(error.response)[0]; // Определяем первое поле с ошибкой
+          switch (errorField) {
+            case 'email':
               setErrorMessage('Пользователь с таким email уже существует');
               break;
-            case "password":
+            case 'password':
               setErrorMessage('Пароли не совпадают');
               break;
-            case "name":
+            case 'name':
               setErrorMessage('Пользователь с таким именем уже существует');
-              break
+              break;
             default:
-              setErrorMessage('Неправильно заполнена форма');
+              setErrorMessage('Ошибка заполнения формы');
               break;
           }
         } else {
-          console.error("Unexpected error:", error.message);
+          setErrorMessage('Произошла неизвестная ошибка');
         }
       },
-
     });
-  
+  };
 
-  };
-  type Field = {
-    label: string;
-    type: "text" | "email" | "password" | "tel" | "number" | "select" | 'date'; // Add more as needed
-    name: string;
-    options?: { value: string; label: string }[]; // Optional for select fields
-  };
-  const fields: Field[] = [
-    {
-      label: "Электронная почта",
-      type: "email",
-      name: "email",
-    },
-    {
-      label: "Имя пользователя",
-      type: "text",
-      name: "name",
-    },
-    {
-      label: "Пароль",
-      type: "password",
-      name: "password",
-    },
-    {
-      label: "Повторите пароль",
-      type: "password",
-      name: "re_password",
-    },
+
+  const fields = [
+    { label: "Электронная почта", type: "email", name: "email" },
+    { label: "Имя пользователя", type: "text", name: "name" },
+    { label: "Пароль", type: "password", name: "password" },
+    { label: "Повторите пароль", type: "password", name: "re_password" },
     {
       label: "Страна",
       type: "select",
@@ -104,7 +107,7 @@ const RegistrationForm: React.FC = () => {
       options: countryList?.map((country) => ({
         value: country.country_code,
         label: country.country_name,
-      })) || [],
+      })),
     },
     {
       label: "Город",
@@ -113,24 +116,18 @@ const RegistrationForm: React.FC = () => {
       options: citiesList?.map((city) => ({
         value: city.city,
         label: city.city,
-      })) || [],
+      })),
     },
-    {
-      label: "Телефон",
-      type: "tel",
-      name: "phone",
-    },
-    {
-      label: "Дата рождения",
-      type: "date",
-      name: "date_of_birth",
-    },
+    { label: "Телефон", type: "tel", name: "phone" },
+    { label: "Дата рождения", type: "date", name: "date_of_birth" },
   ];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Регистрация</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
+          Регистрация
+        </h2>
         <form onSubmit={handleSubmit}>
           {fields.map((field) => (
             <InputField
@@ -140,21 +137,24 @@ const RegistrationForm: React.FC = () => {
               name={field.name}
               value={formData[field.name as keyof RegistrationFormData]}
               onChange={handleInputChange}
-              required={false} // Для телефона не обязательно
+              required={true} 
               options={field.options}
             />
           ))}
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
-            disabled={isLoading} // Отключаем кнопку при загрузке
+            disabled={isRegistering}
           >
-            {isLoading ? "Загрузка..." : "Зарегистрироваться"}
+            {isRegistering 
+              ? "Загрузка..."
+              : "Зарегистрироваться"}
           </button>
 
           {/* Сообщения об ошибке или успехе */}
-          {isError && <p className="text-red-500 text-sm mt-4">{errorMessage}</p>}
-          {isSuccess && <p className="text-green-500 text-sm mt-4">Регистрация прошла успешно!</p>}
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-4">{errorMessage}</p>
+          )}
         </form>
       </div>
     </div>
