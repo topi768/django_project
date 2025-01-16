@@ -16,9 +16,6 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-
-
-
     def __str__(self):
         return self.name
 
@@ -50,7 +47,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
-
     def __str__(self):
         return self.email
 
