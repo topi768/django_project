@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from django.contrib.auth import get_user_model
-from .models import UserAccount, UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
+from .models import UserAccount,ImageWithCoordinates,  UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
 
 
 
@@ -70,3 +70,11 @@ class CityAndCountryCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CityAndCountryCode
         fields = ('country_code', 'city')
+
+class ImageWithCoordinatesSerializer(serializers.ModelSerializer):
+    width = serializers.IntegerField()
+    height = serializers.IntegerField()
+    level = serializers.IntegerField()
+    class Meta:
+        model = ImageWithCoordinates
+        fields = ['id', 'image', 'coordinates', 'created_at', 'width', 'height', 'level']

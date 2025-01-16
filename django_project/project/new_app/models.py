@@ -89,3 +89,12 @@ class CityAndCountryCode(models.Model):
     )
     def __str__(self):
         return f"{self.country_code} ({self.city})"
+
+
+class ImageWithCoordinates(models.Model):
+    image = models.ImageField(upload_to='images/')  # Поле для хранения пути к изображению
+    coordinates = models.JSONField()  # Хранение координат в формате JSON
+    width = models.IntegerField()  # Поле для ширины изображения
+    height = models.IntegerField()
+    level = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)  # Автоматическое добавление дат
