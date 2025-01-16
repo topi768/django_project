@@ -1,26 +1,28 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useCountryList, useCitiesList } from "../hooks/useCountryList";
 import { useCreateUser, useCreateUserToken } from "../hooks/useUser";
 import InputField from "@/components/ui/InputField";
 import { RegistrationFormData } from "@/types";
-import {useAuthStore} from '@/store/authSrote'
+import {useAuthStore} from '@/store/authStore'
 import { useNavigate } from "react-router-dom";
 
 const RegistrationForm: React.FC = () => {
+  
   const navigate = useNavigate();
   const { isAuth, setAuth } = useAuthStore.getState();
   const [formData, setFormData] = useState<RegistrationFormData>({
-    email: "",
-    name: "",
+    email: "topi768@inbox.ru",
+    name: "Владимир Котофф",
     password: "1234567890Q!",
     re_password: "1234567890Q!",
     country: "",
     city: "",
     phone: "",
-    date_of_birth: "",
+    date_of_birth: "2005-05-20",
   });
 
   const { data: countryList } = useCountryList();
+
   const { data: citiesList } = useCitiesList(formData.country);
   const [isRegistering, setIsRegistering] = useState(false);
   // Переносим вызов хука на уровень компонента
@@ -30,7 +32,6 @@ const RegistrationForm: React.FC = () => {
 
 const { 
   mutateAsync: createToken,
-  isLoading: isTokenCreating
 } = useCreateUserToken();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -38,16 +39,28 @@ const {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    
   };
 
+
   const handleSubmit = async (e: FormEvent) => {
+    if ( formData.phone === "" ) {
+      setErrorMessage('Поле для телефона пустое');
+      return
+    }
+
     e.preventDefault();
     setIsRegistering(true);
     
+
+    
     registerUser(formData, {
-      onSuccess: async () => {
+      onSuccess: async (createdUser) => {
+        
+        localStorage.setItem('user_id', createdUser.id);
         setIsRegistering(false);
-        console.log('Registration successful!');
+        console.log('Registration successful! ') ;
 
         try {
           const tokenData = await createToken(formData);

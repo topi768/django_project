@@ -35,7 +35,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   };
   const [key, setKey] = useState(0);
   const [countHints, setCountHints] = useState(3);
-  const [isOpenOnboarding, setIsOpenOnboarding] = useState<boolean | null>(
+  const [isOpenOnboarding, setIsOpenOnboarding] = useState<boolean >(
     localStorage.getItem("isOpenOnboarding") === "true"
   );
   const [isOpenPrestartModal, setIsOpenPrestartModal] = useState(false);
@@ -172,15 +172,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
     }
   };
 
-  const ondoarding = (
-    <ModalRoot activeModal="ondoarding">
-      <ModalPage
-        className=" w-full h-full "
-        id="ondoarding"
-        hideCloseButton
-      ></ModalPage>
-    </ModalRoot>
-  );
+
 
   return (
     <Panel key={key} id={id} className=" h-full relative  ">

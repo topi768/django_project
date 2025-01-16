@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { deleteFile } from "../api/admin/fileStorage";
 
 export const useFileDelete = () => {
   return useMutation({
@@ -9,7 +8,7 @@ export const useFileDelete = () => {
       }
 
       try {
-        const result = await deleteFile(id);
+        const result = 'deleted';
         console.log("File deleted:", result);
 
         return result;

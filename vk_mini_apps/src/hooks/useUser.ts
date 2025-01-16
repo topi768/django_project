@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getUserFetcher, createUserFetcher, authTokenFetcher } from "../api/appInfo/user";
-import {RegistrationFormData, UserDataForToken} from "@/types";
+import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher } from "../api/appInfo/user";
+import {RegistrationFormData, UserDataForToken, UserData} from "@/types";
 import { useState } from "react";
 
 export const useUser = () => {
@@ -66,5 +66,14 @@ export const useCreateUserToken = () => {
       }
     },
     retry: 3,
+  });
+};
+
+export const useGetUserData = (user_id: number) => {
+  return useQuery<UserData, Error>({
+    queryKey: ["userData"],
+    queryFn: async () => await getUserDataFetcher(user_id),
+    retry: 3,
+    staleTime: 1000 * 60 * 5,
   });
 };

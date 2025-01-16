@@ -46,6 +46,8 @@ const InputField: React.FC<InputFieldProps> = ({
   };
 
   const handleSelectChange = (selectedOption: { value: string; label: string } | null) => {
+    console.log();
+    
     onChange({ target: { name, value: selectedOption ? selectedOption.value : "" } });
   };
 
@@ -97,6 +99,7 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={onChange}
         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
         required={required}
+         max="2025-12-31"
       />
     </div>
   );

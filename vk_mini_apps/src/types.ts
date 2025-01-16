@@ -36,3 +36,12 @@ export interface UserDataForToken {
   email: string;
   password: string
 }
+export interface UserData {
+  email: string;
+  name: string;
+  country: string;
+  city: string;
+  interests?: string | null;
+  phone: string;
+  date_of_birth: string;
+}

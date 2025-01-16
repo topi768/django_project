@@ -8,7 +8,7 @@ import { Friends } from "./panels/Friends";
 import { Friend } from "./panels/Friend";
 import { ScoreList } from "./panels/ScoreList";
 import { СurrencyPurchase } from "./panels/СurrencyPurchase";
-import { AdminPanel } from "./panels/AdminPanel";
+// import { AdminPanel } from "./panels/AdminPanel";
 import RegisterPage from "./panels/RegisterPage";
 import { Achievements } from "./panels/Achievements";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { Header } from "./components/Header";
 import { Footer } from "@/components/Footer";
 import "./App.css";
-import {useAuthStore} from "@/store/authSrote"
+import {useAuthStore} from "@/store/authStore"
 import { StrictMode } from "react";
 
 const App = () => {
@@ -72,10 +72,10 @@ const App = () => {
               <ProtectedRoute isAuth={isAuth} component={<СurrencyPurchase />} />
             }
           />
-          <Route
+          {/* <Route
             path="/admin"
             element={<ProtectedRoute isAuth={isAuth} component={<AdminPanel />} />}
-          />
+          /> */}
           <Route
             path="/achievements"
             element={
