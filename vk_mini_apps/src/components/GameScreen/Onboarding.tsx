@@ -14,14 +14,14 @@ interface OnboardingProps {
 }
 type Dialogs = {
   text: string;
-  highlightedElement: string;
+  highlightedElement: string | null;
   coordY: string;
 };
 
 const dialogs: Dialogs[] = [
   {
     text: "Привет, рядовой! Помоги мне найти сбежавших котиков. ",
-    highlightedElement: "",
+    highlightedElement: null,
     coordY: "74%",
   },
   {
@@ -46,7 +46,7 @@ const dialogs: Dialogs[] = [
   },
   {
     text: "Ну, как-то так. Не будем терять время - на поиски! ",
-    highlightedElement: "",
+    highlightedElement: null,
     coordY: "40%",
   },
 ];
@@ -72,7 +72,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({
   if (isOpen) {
     return createPortal(
       <div
-        className={`"w-full h-full absolute left-0 top-0 px-6 `}
+        className={`w-full h-full absolute  left-0 top-0 px-6 z-50 `}
         style={{transition: "top 0.5s ease-in-out", top: dialogs[currentDialog].coordY }}
       >
         <div className="flex ">

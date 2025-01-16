@@ -7,10 +7,11 @@ interface TimerProps {
   startTime: number;
   onEnd: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const GameTimer = forwardRef<HTMLDivElement, TimerProps>(
-  ({ isPause, startTime, onEnd, className = "" }, ref) => {
+  ({ isPause, startTime, onEnd, className = "" , style}, ref) => {
     const [secondsRemaining, setSecondsRemaining] = useState(startTime);
 
     useEffect(() => {
@@ -42,10 +43,10 @@ export const GameTimer = forwardRef<HTMLDivElement, TimerProps>(
     }, [isPause, onEnd, secondsRemaining]);
 
     return (
-      <div ref={ref} className={`timer-container ${className}`}>
+      <div ref={ref} style={style} className={`timer-container ${className}`}>
         <div
-          className={`flex justify-center items-center gap-2.5 py-2 px-5 w-[9.625rem] rounded-full ${
-            secondsRemaining < 11 ? "bg-[#FE4202]" : "bg-[#8484f0]"
+          className={`flex justify-center items-center gap-2.5 py-2 px-5 w-[9.625rem] transition-colors duration-300 rounded-full ${
+            secondsRemaining < 11 ? "bg-[#FE4202]" : "bg-[#8484f0] "
           }`}
         >
           <IconTimer />

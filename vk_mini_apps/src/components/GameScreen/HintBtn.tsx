@@ -4,15 +4,16 @@ interface HintBtnProps {
   countHint: number;
   onClick: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const HintBtn = forwardRef<HTMLDivElement, HintBtnProps>(
   (props, ref) => {
-    const { countHint, onClick, className = "", ...datum } = props;
+    const { countHint, onClick, className = "", style, ...datum } = props;
 
     return (
       <>
-        <div className={className} {...datum} ref={ref}>
+        <div style={style} className={className} {...datum} ref={ref}>
           <button
             onClick={onClick}
             className=" relative w-16 h-16 rounded-full bg-[#8484f0]"

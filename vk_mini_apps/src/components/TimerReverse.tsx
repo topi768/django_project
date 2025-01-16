@@ -56,7 +56,7 @@ export const TimerReverse: React.FC<TimerProps> = ({
       formatedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
     } else {
       if (hours > 0) {
-        formatedTime = `${hours}:${minutes.toString().padStart(2, "0")}}:${secondsLeft.toString().padStart(2, "0")}`;
+        formatedTime = `${hours}:${minutes.toString().padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
       } else if (minutes > 0) {
         formatedTime = `${minutes}:${secondsLeft.toString().padStart(2, "0")}`;
       } else {
