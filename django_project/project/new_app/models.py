@@ -24,7 +24,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.conf import settings
 
-
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, name, password=None, **extra_fields):
         if not email:
@@ -37,20 +36,27 @@ class UserAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create_superuser(self, email, name, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
+        return self.create_user(email, name, password, **extra_fields)
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
+    is_staff = models.BooleanField(default=False)  # Добавлено поле is_staff
+    is_active = models.BooleanField(default=True)  # Добавлено поле is_active
+    is_superuser = models.BooleanField(default=False)  # Добавлено поле is_superuser
 
     objects = UserAccountManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
+
     def __str__(self):
         return self.email
 
-from rest_framework import serializers
 
 class UserAccountInfo(models.Model):
     user = models.OneToOneField(
@@ -94,7 +100,6 @@ class CityAndCountryCode(models.Model):
 class ImageWithCoordinates(models.Model):
     image = models.ImageField(upload_to='images/')  # Поле для хранения пути к изображению
     coordinates = models.JSONField()  # Хранение координат в формате JSON
-    width = models.IntegerField()  # Поле для ширины изображения
-    height = models.IntegerField()
+
     level = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)  # Автоматическое добавление дат
