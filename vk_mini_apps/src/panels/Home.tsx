@@ -77,24 +77,7 @@ export const Home: FC<HomeProps> = ({ id }) => {
     achievementsCount: 0,
   };
   const rankingData = [
-    {
-      iconName: "",
-      route: "",
-      text: "Страна",
-      value: userData?.country ? country : "Не указано",
-    },
-    {
-      iconName: "",
-      route: "",
-      text: "Город",
-      value: userData?.city ? userData.city : "Не указано",
-    },
-    {
-      iconName: "",
-      route: "",
-      text: "Возраст",
-      value: userData?.date_of_birth ? getAgeFromBirthDate(userData.date_of_birth) : "Не указано", 
-    },
+
 
     {
       iconName: "score",

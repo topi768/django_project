@@ -46,3 +46,9 @@ export interface UserData {
   phone: string;
   date_of_birth: string;
 }
+export interface UpdateProfileData {
+  name?: string,
+  country?: string ,
+  city?: string, 
+  date_of_birth?: string
+}

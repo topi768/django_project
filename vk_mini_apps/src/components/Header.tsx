@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ className, text }) => {
   const curPanel = location.pathname.split('/').pop(); // Получаем текущую панель из пути
 
   const onClick = () => {
-    navigate("/"); // Переход на главную страницу
+    navigate("/home"); // Переход на главную страницу
   };
 
   return (

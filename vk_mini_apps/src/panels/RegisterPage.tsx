@@ -76,7 +76,7 @@ const {
           const refreshToken = tokenData.refresh;
 
           
-          sessionStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('accessToken', accessToken);
           document.cookie = `refreshToken=${refreshToken}; path=/; secure; httpOnly;`
 
           setAuth(true);

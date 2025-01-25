@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher } from "../api/appInfo/user";
-import {RegistrationFormData, UserDataForToken, UserData} from "@/types";
+import { useQuery, useMutation, UseMutationResult  } from "@tanstack/react-query";
+import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher } from "../api/appInfo/user";
+import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
 import { useState } from "react";
 
 export const useUser = () => {
@@ -75,5 +75,21 @@ export const useGetUserData = (user_id: number) => {
     queryFn: async () => await getUserDataFetcher(user_id),
     retry: 3,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useUpdateUserProfile = (): UseMutationResult<
+  UpdateProfileData, 
+  Error, 
+  UpdateProfileData
+> => {
+  return useMutation({
+    mutationFn: (formData: UpdateProfileData) => updateUserFetcher(formData),
+    onSuccess: (data) => {
+      console.log('Profile updated successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Failed to update profile:', error);
+    },
   });
 };

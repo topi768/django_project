@@ -9,6 +9,7 @@ interface AvatarProps {
   typeBaseAvatar?: number;
   typeRank?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   link?: string;
+  onClick?: () => void;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -16,7 +17,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   className,
   typeBaseAvatar = 1,
   typeRank = 1,
-  link = ""
+  link = "",
+  onClick,
 }) => {
   const navigate = useNavigate();
   let BaseAvatar;
@@ -38,7 +40,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <>
-      <div className={className} onClick={ () => navigate(link)}>
+      <div className={className} onClick={onClick}>
         <div className="relative">
           {srcImage == "" ? (
             <div>{<BaseAvatar />}</div>

@@ -1,77 +1,22 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
-import { UserInfo } from "@vkontakte/vk-bridge";
-import { useRouteNavigator } from "@vkontakte/vk-mini-apps-router";
+import { useNavigate } from "react-router-dom";
+import { EditableText } from "@/components/ui/inputs/EditableText"; // Импорт нового компонента
+import { useUpdateUserProfile } from "../hooks/useUser.ts";
+import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
 import { Header } from "../components/Header";
-import { Spacing } from "../components/ui/Spacing";
-import { Avatar } from "../components/Avatar";
 import { Footer } from "../components/Footer";
-import { useNavigate } from "react-router-dom";
-import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
-import PhoneInput from "@/components/ui/inputs/TelInput.tsx";
 import SelectInput from "@/components/ui/inputs/SelectInput.tsx";
-
-import styles from "./Profile.module.css";
 import InputField from "@/components/ui/inputs/InputField.tsx";
+import { Avatar } from "../components/Avatar";
 import { ListItem } from "@/components/ui/ListItem.tsx";
-import { get } from "node_modules/axios/index.d.cts";
 
-export interface ProfileProps extends NavIdProps {
-    fetchedUser?: UserInfo;
-}
-
-const EditableText: FC<{ 
-    name: string; 
-    onSave: (newName: string) => void; 
-}> = ({ name, onSave }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentName, setCurrentName] = useState(name);
-    const [showInput, setShowInput] = useState(false); // Для анимации
-
-    const handleSave = () => {
-        setIsEditing(false);
-        onSave(currentName);
-    };
-
-    useEffect(() => {
-        if (isEditing) {
-            setShowInput(true);
-        } else {
-            const timeout = setTimeout(() => setShowInput(false), 300);
-            return () => clearTimeout(timeout);
-        }
-    }, [isEditing]);
-
-    return (
-        <div className={styles.editableText}>
-            {isEditing ? (
-                <input
-                    name="name"
-                    type="text"
-                    value={currentName}
-                    autoFocus
-                    className={`${styles.textInput} ${showInput ? styles.inputVisible : styles.inputHidden}`}
-                    onChange={(e) => setCurrentName(e.target.value)}
-                    onBlur={handleSave}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSave();
-                        if (e.key === "Escape") setIsEditing(false);
-                    }}
-                />
-            ) : (
-                <h3
-                    className={`${styles.textDisplay} ${isEditing ? styles.hiddenText : ""}`}
-                    onClick={() => setIsEditing(true)}
-                >
-                    {currentName}
-                </h3>
-            )}
-        </div>
-    );
-};
+export interface ProfileProps extends NavIdProps {}
 
 export const Profile: FC<ProfileProps> = ({ id }) => {
+    const mutationUpdateProfile = useUpdateUserProfile();
+
     const { data: countryList } = useCountryList();
     const navigate = useNavigate();
 
@@ -84,21 +29,25 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         country_code: string;
         city: string;
         date_of_birth: string;
-    }
+    };
     const [formData, setFormData] = useState<FormData>({
         name: parsedUserData?.name || "Не указано",
         country_name: parsedUserData?.country_name || "Не указано",
         country_code: parsedUserData?.country || "Не указано",
         city: parsedUserData?.city || "Не указано",
         date_of_birth: parsedUserData?.date_of_birth || "Не указано",
-    })
+    });
+
     const { data: citiesList } = useCitiesList(formData.country_code);
-
-
-    function getAgeFromBirthDate(birthDateString: string): number {
+    const getAgeFromBirthDate = (birthDateString: string): number => {
         const birthDate = new Date(birthDateString);
+    /**
+     * Calculates age from a given birth date string in "YYYY-MM-DD" format
+     * @param birthDateString - String in "YYYY-MM-DD" format
+     * @returns Age in years. If the date is invalid, returns 0
+     */
         if (isNaN(birthDate.getTime())) {
-            throw new Error("Неверный формат даты.");
+            return 0; // Возраст не определён
         }
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -112,84 +61,100 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         }
 
         return age;
-    }
-
-    const handleSaveProfile = () => {
-        const user_id = localStorage.getItem('user_id')
     };
 
-    const handleInputChangeCountry = (e: { value: string; label: string; }) => {
-        setFormData({ ...formData, country_name: e.label, country_code: e.value});
-    }
-    const handlerInputChangeCity = (e: { value: string; label: string; }) => {
-        setFormData({ ...formData, city: e.value});
-    }
-    const handleInputChangeDate= (e: { target: { value: string; }; }) => {
-        setFormData({ ...formData, date_of_birth: e.target.value});
-        
-    }
+    const handleSaveProfile = () => {
+        mutationUpdateProfile.mutate({
+            name: formData.name,
+            country: formData.country_code,
+            city: formData.city,
+            date_of_birth: formData.date_of_birth,
+        });
+    };
+
+    const handleInputChangeCountry = (e: { value: string; label: string }) => {
+        setFormData({ ...formData, country_name: e.label, country_code: e.value, city: "Не указано" });
+    };
+
+    const handlerInputChangeCity = (e: { value: string; label: string }) => {
+        setFormData({ ...formData, city: e.value });
+    };
+
+    const handleInputChangeDate = (e: { target: { value: string } }) => {
+        setFormData({ ...formData, date_of_birth: e.target.value });
+    };
+
     return (
-        <>
-            <Panel id={id}>
-                <div className="px-6">
-                    <Header text="Профиль" />
-                    <div>
-                        <Spacing />
-                        <div>
-                            <div className="flex relative my-7">
-                                <Avatar className="mr-6" typeRank={7} />
-                                <div className="h-full flex flex-col gap-2 w-full">
-                                    <EditableText name={formData.name} onSave={() => {} } />
-                                    <p className="text-[#8484f0] leading-[1.125rem]">
-                                        {"Сержант Кискисенко"}
-                                    </p>
-                                </div>
-                            </div>
-                            <form>
-                                <SelectInput
-                                    label="Страна"
-                                    defaultValue={{ label: formData.country_name, value: "RU" }}
-                                    value={formData.country_name}
-                                    options={countryList?.map((country) => ({
-                                        value: country.country_code,
-                                        label: country.country_name,
-                                    }))}
-                                    onChange={handleInputChangeCountry}
-                                />
-
-                                 <SelectInput
-                                    label="Город"
-                                    value={formData.city}
-                                    options={citiesList?.map((city) => ({
-
-                                        value: city.city,
-                                        label: city.city,
-                                    }))}
-                                    onChange={handlerInputChangeCity}
-                                />
-                                <InputField 
-                                label={"Дата рождения"} 
-                                type={"date"} 
-                                name={""}
-                                value={formData.date_of_birth} 
-                                onChange={ handleInputChangeDate}                                
-                                />
-                            <ListItem iconName={""} route={""} text={"Сейчас вам "} value={getAgeFromBirthDate(formData.date_of_birth)  } />
-
-                            </form>
-                        </div>
-
-                        <div>
-                            <LargeButton
-                                text="Сохранить"
-                                onClick={handleSaveProfile}
+        <Panel id={id}>
+            <div className="px-6">
+                <Header text="Профиль" />
+                <div>
+                    <div className="flex relative my-7">
+                        <Avatar className="mr-6" typeRank={7} />
+                        <div className="h-full flex flex-col gap-2 w-full">
+                            <EditableText
+                                name={formData.name}
+                                onSave={(newName) => setFormData({ ...formData, name: newName })}
                             />
+                            <p className="text-[#8484f0] leading-[1.125rem]">{"Сержант Кискисенко"}</p>
                         </div>
                     </div>
+                    <form>
+                        <SelectInput
+                            label="Страна"
+                            defaultValue={{ label: formData.country_name, value: "RU" }}
+                            value={formData.country_name}
+                            options={countryList?.map((country) => ({
+                                value: country.country_code,
+                                label: country.country_name,
+                            }))}
+                            onChange={handleInputChangeCountry}
+                        />
+
+                        <SelectInput
+                            label="Город"
+                            value={formData.city}
+                            options={citiesList?.map((city) => ({
+                                value: city.city,
+                                label: city.city,
+                            }))}
+                            onChange={handlerInputChangeCity}
+                        />
+                        <InputField
+                            label={"Дата рождения"}
+                            type={"date"}
+                            name={""}
+                            value={formData.date_of_birth}
+                            onChange={handleInputChangeDate}
+                        />
+                        <ListItem
+                            iconName={""}
+                            route={""}
+                            text={"Сейчас вам "}
+                            value={getAgeFromBirthDate(formData.date_of_birth)}
+                        />
+                    </form>
                 </div>
 
-                <Footer />
-            </Panel>
-        </>
+                <div>
+                    <LargeButton text="Сохранить" onClick={handleSaveProfile} />
+                </div>
+
+                {/* Отображение статуса */}
+                <div className="mt-4">
+                    {mutationUpdateProfile.status === "pending" && (
+                        <p className="text-blue-500">Обновление данных...</p>
+                    )}
+                    {mutationUpdateProfile.status === "error" && (
+                        <p className="text-red-500">Ошибка при обновлении данных. Попробуйте снова.</p>
+                    )}
+                    {mutationUpdateProfile.status === "success" && (
+                        <p className="text-green-500">Данные успешно обновлены!</p>
+                    )}
+                </div>
+            </div>
+
+            <Footer />
+        </Panel>
     );
 };

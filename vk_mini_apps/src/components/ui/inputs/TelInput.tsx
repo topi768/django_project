@@ -38,7 +38,7 @@ const TelInput: React.FC<TelInputProps> = ({ label, name, value, onChange, requi
         <PhoneInput
           localization={localization}
           country={country_code_lovercase}
-          value={value}
+          value={'value'}
           onChange={handlePhoneChange}
           inputProps={{
             name,

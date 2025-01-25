@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserAccountInfo, UserAccount, CountryCodeAndCountryName, CityAndCountryCode
-from .serializers import UserAccountInfoSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
+from .serializers import UserAccountInfoSerializer, UserProfileUpdateSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
@@ -73,3 +73,25 @@ def upload_image(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PATCH'])
+def user_profile_update(request):
+    print("HEADERS: ", request.headers)  # Вывод всех заголовков
+    print("AUTHORIZATION: ", request.headers.get('Authorization'))
+    
+    user = request.user
+    if not user.is_authenticated:
+        return Response({"detail": "User not authenticated"}, status=401)
+
+    # Получаем информацию о пользователе из модели UserAccountInfo через связь 'info'
+    try:
+        user_info = user.info  # Используем 'info', как указано в related_name
+    except UserAccountInfo.DoesNotExist:
+        return Response({"detail": "User info not found"}, status=404)
+
+    # Создаем сериализатор и передаем данные для обновления
+    serializer = UserProfileUpdateSerializer(user_info, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()  # Обновляем информацию пользователя
+        return Response(serializer.data, status=200)
+    return Response(serializer.errors, status=400)

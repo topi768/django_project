@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from django.contrib.auth import get_user_model
 from .models import UserAccount,ImageWithCoordinates,  UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
+from rest_framework.views import APIView
 
 
 
@@ -16,7 +17,6 @@ class UserCreateSerializer(BaseUserCreateSerializer):
     phone = serializers.CharField(required=False, allow_blank=True)
     date_of_birth = serializers.DateField(required=False, allow_null=True)
     interests = serializers.CharField(required=False, allow_blank=True)
-    print(interests)
     class Meta(BaseUserCreateSerializer.Meta):
         model = UserAccount
         fields = (
@@ -31,7 +31,6 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         )
 
     def create(self, validated_data):
-        # Извлекаем данные для `UserAccountInfo`
         info_fields = {
             "country": validated_data.pop("country", None),
             "city": validated_data.pop("city", None),
@@ -40,14 +39,12 @@ class UserCreateSerializer(BaseUserCreateSerializer):
             "interests": validated_data.pop("interests", None),
         }
 
-        # Создаем пользователя
         user = UserAccount.objects.create_user(
             email=validated_data["email"],
             name=validated_data["name"],
             password=validated_data["password"],
         )
 
-        # Создаем запись в `UserAccountInfo`
         UserAccountInfo.objects.create(user=user, **info_fields)
 
         return user
@@ -78,3 +75,25 @@ class ImageWithCoordinatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageWithCoordinates
         fields = ['id', 'image', 'coordinates', 'created_at', 'width', 'height', 'level']
+
+
+
+from rest_framework import serializers
+from .models import UserAccountInfo
+
+
+class UserProfileUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, allow_blank=True)
+    country = serializers.CharField(required=False, allow_blank=True)  # Используем поле 'country'
+    city = serializers.CharField(required=False, allow_blank=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+    phone = serializers.CharField(required=False, allow_blank=True)
+
+    def update(self, user_info, validated_data):
+        user_info.name = validated_data.get('name', user_info.name)
+        user_info.country = validated_data.get('country', user_info.country)  # Обновляем поле 'country'
+        user_info.city = validated_data.get('city', user_info.city)
+        user_info.date_of_birth = validated_data.get('date_of_birth', user_info.date_of_birth)
+        user_info.phone = validated_data.get('phone', user_info.phone)
+        user_info.save()
+        return user_info

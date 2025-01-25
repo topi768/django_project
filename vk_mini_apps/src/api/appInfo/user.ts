@@ -1,5 +1,6 @@
 import { apiUrls, instance } from "../instance";
-import { UserDataForToken, RegistrationFormData, UserData } from "@/types";
+import { instanceWithJWT } from "../instanceWithJWT";
+import { UserDataForToken, RegistrationFormData, UserData, UpdateProfileData } from "@/types";
 export const getUserFetcher = async () => {
   const response = await instance.get(apiUrls.appInfo.user);
 
@@ -19,5 +20,10 @@ export const authTokenFetcher = async (userData: UserDataForToken) => {
 export const getUserDataFetcher = async (user_id: number): Promise<UserData>  => {
   const response = await instance.get('api/user-account-info/' + user_id);
   
+  return response.data;
+}
+
+export const updateUserFetcher = async (profileData: UpdateProfileData) => {
+  const response = await instanceWithJWT.patch('api/update-profile/', profileData);
   return response.data;
 }

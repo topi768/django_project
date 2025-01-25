@@ -3,7 +3,7 @@ import { Country, City } from '../../types';
 
 
 export const fetchCountryList = async (): Promise<Country[]> => {
-  const response = await instance.get(apiUrls.appInfo.countryList);
+  const response = await instance.get('api/countryList');
   // Очищаем пробелы в начале и конце строки для каждой страны
   return response.data.map((country: Country) => ({
     ...country,
