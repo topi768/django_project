@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import { useCountryList, useCitiesList } from "../hooks/useCountryList";
+import { useCountryList, useCitiesList } from "../hooks/useWorldInfo";
 import { useCreateUser, useCreateUserToken } from "../hooks/useUser";
-import InputField from "@/components/ui/InputField";
+import InputField from "@/components/ui/inputs/InputField";
 import { RegistrationFormData } from "@/types";
 import {useAuthStore} from '@/store/authStore'
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ const RegistrationForm: React.FC = () => {
   const navigate = useNavigate();
   const { isAuth, setAuth } = useAuthStore.getState();
   const [formData, setFormData] = useState<RegistrationFormData>({
-    email: "topi768@inbox.ru",
+    email: "topi82806@gmail.com",
     name: "Владимир Котофф",
     password: "1234567890Q!",
     re_password: "1234567890Q!",
@@ -19,13 +19,13 @@ const RegistrationForm: React.FC = () => {
     city: "",
     phone: "",
     date_of_birth: "2005-05-20",
+    country_name: "",
   });
 
   const { data: countryList } = useCountryList();
-
   const { data: citiesList } = useCitiesList(formData.country);
+
   const [isRegistering, setIsRegistering] = useState(false);
-  // Переносим вызов хука на уровень компонента
   const { 
   mutate: registerUser, 
 } = useCreateUser();
@@ -53,17 +53,25 @@ const {
     e.preventDefault();
     setIsRegistering(true);
     
+    const country_name = countryList?.find((country) => country.country_code === formData.country)?.country_name || "";
+
+    const updatedFormData = {
+      ...formData,
+      country_name: country_name,
+    };
 
     
-    registerUser(formData, {
+    registerUser(updatedFormData, {
       onSuccess: async (createdUser) => {
         
         localStorage.setItem('user_id', createdUser.id);
         setIsRegistering(false);
         console.log('Registration successful! ') ;
-
+        
+        localStorage.removeItem('user_data');
+        localStorage.setItem('user_data', JSON.stringify(updatedFormData));
         try {
-          const tokenData = await createToken(formData);
+          const tokenData = await createToken(updatedFormData);
           const accessToken = tokenData.access;
           const refreshToken = tokenData.refresh;
 
@@ -72,7 +80,7 @@ const {
           document.cookie = `refreshToken=${refreshToken}; path=/; secure; httpOnly;`
 
           setAuth(true);
-          navigate('/home');
+          navigate('/users/' + localStorage.getItem('user_id'));
 
           
         } catch (error) {
@@ -139,7 +147,7 @@ const {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Регистрация
+          Регистрация/Вход
         </h2>
         <form onSubmit={handleSubmit}>
           {fields.map((field) => (
@@ -153,6 +161,7 @@ const {
               required={true} 
               options={field.options}
             />
+            
           ))}
           <button
             type="submit"

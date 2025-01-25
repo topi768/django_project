@@ -5,7 +5,7 @@ interface RankingItemProps {
   iconName: string;
   route: string;
   text: string;
-  value: string;
+  value: string | number;
 }
 
 export const ListItem: React.FC<RankingItemProps> = ({

@@ -31,6 +31,7 @@ export interface RegistrationFormData {
   phone?: string;
   date_of_birth?: string;
   interests?: string[];
+  country_name: string;
 }
 export interface UserDataForToken {
   email: string;

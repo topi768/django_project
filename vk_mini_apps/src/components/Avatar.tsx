@@ -1,12 +1,14 @@
 import IconBaseAvatar1 from "@/assets/icons/baseAvatar/avatar/1.svg";
 import IconBaseAvatar2 from "@/assets/icons/baseAvatar/avatar/2.svg";
 import IconBaseAvatar3 from "@/assets/icons/baseAvatar/avatar/3.svg";
+import { useNavigate } from "react-router-dom";
 import Gerland from "./ui/Gerland";
 interface AvatarProps {
   srcImage?: string;
   className?: string;
   typeBaseAvatar?: number;
   typeRank?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  link?: string;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -14,7 +16,9 @@ export const Avatar: React.FC<AvatarProps> = ({
   className,
   typeBaseAvatar = 1,
   typeRank = 1,
+  link = ""
 }) => {
+  const navigate = useNavigate();
   let BaseAvatar;
 
   switch (typeBaseAvatar) {
@@ -34,7 +38,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <>
-      <div className={className}>
+      <div className={className} onClick={ () => navigate(link)}>
         <div className="relative">
           {srcImage == "" ? (
             <div>{<BaseAvatar />}</div>

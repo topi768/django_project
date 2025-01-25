@@ -99,7 +99,7 @@ DATABASES = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # или другой порт, на котором работает ваш React
+    "http://localhost:5174",  # или другой порт, на котором работает ваш React
 ]
 
 # Password validation

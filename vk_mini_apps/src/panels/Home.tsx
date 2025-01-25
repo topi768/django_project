@@ -12,7 +12,7 @@ import { ListItem } from "../components/ui/ListItem";
 import { useUser } from "../hooks/useUser.ts";
 import { useNavigate } from "react-router-dom";
 import { useGetUserData } from "@/hooks/useUser"; 
-import { useCountryList, useCitiesList } from "../hooks/useCountryList";
+import { useCountryList, useCitiesList } from "../hooks/useWorldInfo.ts";
 
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;

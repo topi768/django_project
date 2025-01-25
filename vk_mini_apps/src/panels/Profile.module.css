@@ -1,0 +1,37 @@
+.editableText {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .textInput {
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scale(1);
+  }
+  
+  .inputVisible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .inputHidden {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  
+  .textDisplay {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .hiddenText {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  
+  .textInput:focus {
+    outline: none;
+  }
+  

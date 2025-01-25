@@ -6,6 +6,7 @@ import { Home } from "./panels/Home";
 import { GameScreen } from "./panels/GameScreen";
 import { Friends } from "./panels/Friends";
 import { Friend } from "./panels/Friend";
+import { Profile } from "./panels/Profile";
 import { ScoreList } from "./panels/ScoreList";
 import { СurrencyPurchase } from "./panels/СurrencyPurchase";
 // import { AdminPanel } from "./panels/AdminPanel";
@@ -72,24 +73,27 @@ const App = () => {
               <ProtectedRoute isAuth={isAuth} component={<СurrencyPurchase />} />
             }
           />
-          {/* <Route
-            path="/admin"
-            element={<ProtectedRoute isAuth={isAuth} component={<AdminPanel />} />}
-          /> */}
+
+
           <Route
             path="/achievements"
             element={
               <ProtectedRoute isAuth={isAuth} component={<Achievements />} />
             }
           />
-
+          <Route
+            path="/users/:userId/"
+            element={
+              <ProtectedRoute isAuth={isAuth} component={<Profile />} />
+            }
+          />
           {/* Страница регистрации */}
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Перенаправление по умолчанию */}
           <Route
   path="*"
-  element={<Navigate to={isAuth ? "/home" : "/register"} replace />}
+  element={<Navigate to={isAuth ? "/profile" : "/register"} replace />}
 />
         </Routes>
 

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState, useEffect } from "react";
 import "react-phone-input-2/lib/style.css";
-import { useCountryList } from "@/hooks/useCountryList";
+import { useCountryList } from "@/hooks/useWorldInfo";
 import PhoneInput from "react-phone-input-2";
 
 type localizationType = {
