@@ -48,6 +48,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   const [srcImg, setSrcImg] = useState<string>("");
   const [posHintCircleX, setPosHintCircleX] = useState(20);
   const [posHintCircleY, setPosHintCircleY] = useState(20);
+  const [isShowCircle, setIsShowCircle] = useState(false);
   const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
   const { data: levels, error, isLoading: isGetLvlsLoading, isError } = useGetLvls();
@@ -62,6 +63,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
           y: levels[key].coordinates[i].y,
           id: i + 1,
           isFind: false,
+          
         });
       }
       setSrcImg(levels[key].image);
@@ -71,6 +73,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
 
   const handleClickHint = () => {
+    setIsShowCircle(true);
     catsCoords.map((cat) => {
       if (!cat.isFind) {
         setPosHintCircleX(cat.x + cat.width / 2);
@@ -243,6 +246,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
             className="translate-y-[6px] duration-300"
             countHint={countHints}
             onClick={handleClickHint}
+            
             style={{ opacity: hintButtonOpacity }} // Используем состояние для opacity
           />
           <PauseBtn
@@ -266,7 +270,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
           onClose={() => setIsOpenResults(false)}
           OnRepeatGame={resetGame}
         />
-        <HintCircle countHints={countHints} pointCordX={posHintCircleX} pointCordY={posHintCircleY} containerRef={containerRef} />
+        <HintCircle countHints={countHints} pointCordX={posHintCircleX} pointCordY={posHintCircleY} containerRef={containerRef} isVisivle={isShowCircle} />
       </div>
     </Panel>
   );

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./Img.module.css"; // импорт CSS Module
+
 type Cat = {
   x: number;
   width: number;
@@ -7,12 +8,14 @@ type Cat = {
   y: number;
   id: number;
   isFind: boolean;
+  isVisible?: boolean;
 };
+
 interface ImgGameProps {
   className?: string;
   onFoundCat: (countFoundedCats: number, isFoundAllCat: boolean, catsCoordinatesProps: Cat[]) => void;
   catsCoordinatesProps: Cat[];
-  src: string,
+  src: string;
   onContainerRefReady?: (ref: React.RefObject<HTMLDivElement>) => void; // Коллбэк для передачи рефа наверх
 }
 
@@ -21,13 +24,12 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   onFoundCat,
   catsCoordinatesProps,
   src,
-  onContainerRefReady
+  onContainerRefReady,
 }) => {
-  const [catsCoordinates, setCatsCoordinates] =
-    useState<Cat[]>(catsCoordinatesProps);
-  // const [countCat, setCountCat] = useState<number>(0);
+  const [catsCoordinates, setCatsCoordinates] = useState<Cat[]>(catsCoordinatesProps);
   const [countFoundedCats, setCountFoundedCats] = useState<number>(0);
   const [isFoundAllCat, setIsFoundAllCat] = useState<boolean>(false);
+
   type CatDisplay = {
     x: number;
     y: number;
@@ -37,9 +39,8 @@ export const ImgGame: React.FC<ImgGameProps> = ({
     isVisible: boolean;
     isFind: boolean;
   };
-  const [positionsCatsOnDisplay, setPositionsCatsOnDisplay] = useState<
-    CatDisplay[]
-  >([]);
+
+  const [positionsCatsOnDisplay, setPositionsCatsOnDisplay] = useState<CatDisplay[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,29 +49,35 @@ export const ImgGame: React.FC<ImgGameProps> = ({
     }
   }, [onContainerRefReady]);
 
-  const isVisibleOnWindow = useCallback(
-    (cat: Cat, xOffsetpx: number, yOffsetpx: number) => {
+  // Проверяет, находится ли кот в пределах видимой области
+  const isVisibleOnWindow = useCallback((cat: CatDisplay) => {
+    const container = containerRef.current;
+    if (!container) return false;
 
-      return true;
-    },
-    [],
-  );
-  // useEffect(() => {
-  //   if (catsCoordinates) {
-  //     setCountCat(catsCoordinates.length);
-      
-  //   }
-    
-  // }, [catsCoordinates]);
+    const containerRect = container.getBoundingClientRect();
+
+    const catRect = {
+      left: cat.x,
+      top: cat.y,
+      right: cat.x + cat.width,
+      bottom: cat.y + cat.height,
+    };
+
+    return (
+      catRect.right >= 0 &&
+      catRect.left <= containerRect.width &&
+      catRect.bottom >= 0 &&
+      catRect.top <= containerRect.height
+    );
+  }, []);
 
   // Функция перерасчета позиций
   const updatePositions = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const { offsetWidth: containerWidth, offsetHeight: containerHeight } =
-      container;
-    const imgAspectRatio = 1 / 1;
+    const { offsetWidth: containerWidth, offsetHeight: containerHeight } = container;
+    const imgAspectRatio = 1 / 1; // Замените на реальный аспект изображения
     const containerAspectRatio = containerWidth / containerHeight;
 
     let imgWidth: number, imgHeight: number;
@@ -86,19 +93,21 @@ export const ImgGame: React.FC<ImgGameProps> = ({
     const xOffset = (containerWidth - imgWidth) / 2;
     const yOffset = (containerHeight - imgHeight) / 2;
 
-    const newPositions = catsCoordinates.map((cat) => ({
-      x: xOffset + (cat.x / 100) * imgWidth,
-      y: yOffset + (cat.y / 100) * imgHeight,
-      width: (cat.width / 100) * imgWidth,
-      height: (cat.height / 100) * imgHeight,
-      isFind: cat.isFind,
-      id: cat.id,
-      isVisible: isVisibleOnWindow(
-        cat,
-        xOffset + (cat.x / 100) * imgWidth,
-        yOffset,
-      ),
-    }));
+    const newPositions = catsCoordinates.map((cat) => {
+      const catDisplay = {
+        x: xOffset + (cat.x / 100) * imgWidth,
+        y: yOffset + (cat.y / 100) * imgHeight,
+        width: (cat.width / 100) * imgWidth,
+        height: (cat.height / 100) * imgHeight,
+        id: cat.id,
+        isFind: cat.isFind,
+        isVisible: false, // Видимость вычисляем ниже
+      };
+
+      catDisplay.isVisible = isVisibleOnWindow(catDisplay); // Определяем видимость кота
+      
+      return catDisplay;
+    });
 
     setPositionsCatsOnDisplay(newPositions);
   }, [catsCoordinates, isVisibleOnWindow]);
@@ -111,7 +120,6 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       resizeObserverPositions.observe(containerRef.current);
     }
 
-
     onFoundCat(countFoundedCats, isFoundAllCat, catsCoordinates);
 
     return () => {
@@ -119,32 +127,28 @@ export const ImgGame: React.FC<ImgGameProps> = ({
     };
   }, [updatePositions, countFoundedCats, onFoundCat, isFoundAllCat]);
 
-
   const handleCatClick = (index: number) => {
     setCatsCoordinates((prevCats) => {
-      // Обновляем массив котов и считаем количество найденных
       const updatedCats = prevCats.map((cat, i) => {
         if (i === index && !cat.isFind) {
-          return { ...cat, isFind: true }; // Обновляем кота как найденного
+          return { ...cat, isFind: true };
         }
-        return cat; // Остальные коты без изменений
+        return cat;
       });
-  
-      // Считаем количество найденных котов
+
       const foundCount = updatedCats.filter((cat) => cat.isFind).length;
       const countCat = updatedCats.length;
-      // Обновляем счетчик найденных котов
+      
+      const visibleCat = positionsCatsOnDisplay.filter((cat) => cat.isVisible).length;
+
       setCountFoundedCats(foundCount);
-  
-  
-      // Проверяем, найдены ли все коты
-      if (foundCount === countCat && countCat !== 0) {
+      
+      if (foundCount ===  visibleCat && countCat !== 0) {
         setIsFoundAllCat(true);
       }
-      
+
       return updatedCats;
     });
-    
   };
 
   return (
@@ -152,34 +156,24 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       ref={containerRef}
       className={`relative w-full h-full flex justify-center items-center overflow-hidden ${className}`}
     >
-      <img
-        src={src}
-        alt="Cat"
-        className="w-full h-full object-cover "
-      />
+      <img src={src} alt="Cat" className="w-full h-full object-cover " />
 
       {positionsCatsOnDisplay.map((cat, index) => (
         <div
           onClick={() => handleCatClick(index)}
           key={index}
           data-cat-index={index}
-          className={` absolute border-solid ${cat.isFind ? styles.square : ""}`}
+          className={`absolute border-solid ${cat.isFind ? styles.square : ""}`}
           style={{
             top: `${cat.y}px`,
             left: `${cat.x}px`,
             width: `${cat.width}px`,
             height: `${cat.height}px`,
-            border : "1px solid white",
-            zIndex: 1
-            // transform: "translate(-50%, -50%)",
+            border: "1px solid white",
+            zIndex: 1,
           }}
         >
-          {cat.isFind && (
-            <img
-              className={`${styles.imgFind} `}
-              src="/src/assets/findEffect.gif"
-            />
-          )}
+          {cat.isFind && <img className={`${styles.imgFind} `} src="/src/assets/findEffect.gif" />}
         </div>
       ))}
     </div>

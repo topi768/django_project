@@ -5,6 +5,7 @@ export interface HintCircleProps {
   pointCordX: number; // Координата X в процентах от исходного размера
   pointCordY: number; // Координата Y в процентах от исходного размера
   containerRef: React.RefObject<HTMLDivElement>;
+  isVisivle: boolean
 }
 
 export const HintCircle: React.FC<HintCircleProps> = ({
@@ -12,6 +13,8 @@ export const HintCircle: React.FC<HintCircleProps> = ({
   pointCordX,
   pointCordY,
   containerRef,
+  isVisivle=false
+  
 }) => {
   const [stepSizeCircle] = useState<number>(40);
   const [radiusHintCircle, setRadiusHintCircle] = useState<number>(
@@ -80,7 +83,9 @@ export const HintCircle: React.FC<HintCircleProps> = ({
   return (
     <>
       {/* Круг */}
-      <img
+    {
+      isVisivle && (
+        <img
         src="src/assets/GameScreen/HintCircle.svg"
         style={{
           display: isShowCircle ? "block" : "none",
@@ -92,9 +97,12 @@ export const HintCircle: React.FC<HintCircleProps> = ({
           zIndex: 0
         }}
       />
+      )
+    }
+
 
       {/* Точка в центре круга */}
-      <div
+      {/* <div
         style={{
           position: "absolute",
           top: centerY - 2 + "px",
@@ -105,7 +113,7 @@ export const HintCircle: React.FC<HintCircleProps> = ({
           backgroundColor: "red",
           zIndex: 10,
         }}
-      />
+      /> */}
     </>
   );
 };
