@@ -15,12 +15,12 @@ export const PauseModal: React.FC<PauseModalProps> = ({ isOpen, onClose }) => {
   const routeNavigator = useRouteNavigator();
   const navigate = useNavigate();
   const onExit = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   if (isOpen) {
     return createPortal(
-      <div className={`" w-full h-full absolute left-0 top-0 px-6  bg-black `}>
+      <div className={`" w-full h-full absolute left-0 top-0 px-6 z-50 bg-black `}>
         <div className="relative w-full h-full  z-10">
           <SleepCat className="absolute left-1/2 -translate-x-1/2 top-0 z-0 " />
           <div className="bg-white px-7 py-10 rounded-2xl z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">

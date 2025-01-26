@@ -52,3 +52,19 @@ export interface UpdateProfileData {
   city?: string, 
   date_of_birth?: string
 }
+
+export type Coordinates = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type LevelData = {
+  id: number;
+  image: string; // Путь к изображению
+  coordinates: Coordinates[]; // Массив координат
+  created_at: string; // Время создания
+  level: number; // Уровень 
+};
+export type LevelsData = LevelData[];

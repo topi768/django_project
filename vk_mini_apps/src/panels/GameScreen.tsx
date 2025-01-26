@@ -8,17 +8,14 @@ import { Onboarding } from "../components/GameScreen/Onboarding";
 import { PauseModal } from "../components/GameScreen/Pause";
 import { Results } from "../components/GameScreen/Results";
 import { HintCircle } from "../components/GameScreen/HintCircle";
-import { createPortal } from "react-dom";
-
-// import { useGetLvls } from "../hooks/useGetLvls";
+import { useGetLvls } from "../hooks/useGetLvls";
 import {
   Panel,
   NavIdProps,
-  ModalRoot,
-  ModalPage,
-  SplitLayout,
+
 } from "@vkontakte/vkui";
 import { ImgGame } from "../components/GameScreen/Img";
+import { BooleanSupportOption } from "prettier";
 
 export interface OnboardingProps extends NavIdProps {
   fetchedUser?: UserInfo;
@@ -33,24 +30,55 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
     id: number;
     isFind: boolean;
   };
+
+
+
+
   const [key, setKey] = useState(0);
+
   const [countHints, setCountHints] = useState(3);
   const [isOpenOnboarding, setIsOpenOnboarding] = useState<boolean >(
     localStorage.getItem("isOpenOnboarding") === "true"
   );
   const [isOpenPrestartModal, setIsOpenPrestartModal] = useState(false);
   const [isOpenPausetModal, setIsOpenPauseModal] = useState(false);
-  const [startSeconds, setStartSeconds] = useState(30000000);
+  const [startSeconds, setStartSeconds] = useState(300000);
   const [isOpenResults, setIsOpenResults] = useState(false);
   const [countFindCast, setCountFindCats] = useState(0);
-  
-  const [catsCoords] = useState<Cat[]>([
-    { x: 16, width: 17, height: 10, y: 81, id: 1, isFind: false },
-    { x: 34, width: 10, height: 10, y: 75, id: 2, isFind: false },
-    { x: 50, width: 10, height: 13, y: 69, id: 3, isFind: false },
+  const [srcImg, setSrcImg] = useState<string>("");
+  const [posHintCircleX, setPosHintCircleX] = useState(20);
+  const [posHintCircleY, setPosHintCircleY] = useState(20);
+  const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
+  const { data: levels, error, isLoading: isGetLvlsLoading, isError } = useGetLvls();
+  useEffect(() => {
+    if (levels) {
+      catsCoords.length = 0;
+      for (let i = 0; i < levels[key].coordinates.length; i++) {
+        catsCoords.push({
+          x: levels[key].coordinates[i].x,
+          width: levels[key].coordinates[i].width,
+          height: levels[key].coordinates[i].height,
+          y: levels[key].coordinates[i].y,
+          id: i + 1,
+          isFind: false,
+        });
+      }
+      setSrcImg(levels[key].image);
+    }
+
+  },[levels])
+
 
   const handleClickHint = () => {
+    catsCoords.map((cat) => {
+      if (!cat.isFind) {
+        setPosHintCircleX(cat.x + cat.width / 2);
+        setPosHintCircleY(cat.y + cat.height / 2);
+      }
+    })
+    
+    
     if (countHints >= 1) {
       setCountHints(countHints - 1);
     } else {
@@ -92,7 +120,6 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
   const timerEL = useRef<HTMLDivElement>(null);
 
-  // Состояния для управления opacity
   const [timerOpacity, setTimerOpacity] = useState(1);
   const [hintButtonOpacity, setHintButtonOpacity] = useState(1);
   const [pauseButtonOpacity, setPauseButtonOpacity] = useState(1);
@@ -104,7 +131,6 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
       setTimerOpacity(1);
       return;
     };
-    console.log(123456);
     
     switch (highlighted) {
       case "timer":
@@ -151,8 +177,6 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
 
 
-
-
   const handleCloseOnboarding = () => {
     setIsOpenOnboarding(false);
 
@@ -164,7 +188,11 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
     localStorage.setItem("isOpenOnboarding", String(false));
   };
 
-  const onFoundCat = (countFoundedCats: number, isFoundAllCat: boolean) => {
+
+  const onFoundCat = (countFoundedCats: number, isFoundAllCat: boolean, catsCoordinatesProps: Cat[]) => {
+    
+    setCatsCoordinates(catsCoordinatesProps);
+
     if (isFoundAllCat) {
       setIsOpenResults(true);
     } else {
@@ -173,11 +201,17 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   };
 
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleContainerRefReady = (ref: React.RefObject<HTMLDivElement>) => {
+    containerRef.current = ref.current;
+    
+  };
 
   return (
     <Panel key={key} id={id} className=" h-full relative  ">
       <div className="w-full h-screen  bg-gray-950 flex justify-center items-center ">
-        <ImgGame onFoundCat={onFoundCat} catsCoordinatesProps={catsCoords} />
+        <ImgGame onContainerRefReady={handleContainerRefReady} onFoundCat={onFoundCat} catsCoordinatesProps={catsCoords} src={'http://localhost:8000' + srcImg}  />
       </div>
       {isOpenOnboarding && (
         <div className="absolute top-0 left-0 w-screen h-screen bg-black opacity-50"></div>
@@ -232,7 +266,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
           onClose={() => setIsOpenResults(false)}
           OnRepeatGame={resetGame}
         />
-        <HintCircle countHints={countHints} pointCordX={250} pointCordY={700} />
+        <HintCircle countHints={countHints} pointCordX={posHintCircleX} pointCordY={posHintCircleY} containerRef={containerRef} />
       </div>
     </Panel>
   );

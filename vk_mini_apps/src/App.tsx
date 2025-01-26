@@ -37,7 +37,7 @@ const App = () => {
   }, [setAuth]);
 
   return (
-    <StrictMode>
+    // <StrictMode>
 
     
     <QueryClientProvider client={queryClient}>
@@ -100,7 +100,7 @@ const App = () => {
         {/* {isAuth && <Footer className="bg-gray-200" />} */}
       </Router>
     </QueryClientProvider>
-    </StrictMode>
+    //{/* </StrictMode> */}
   );
 };
 

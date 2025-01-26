@@ -37,7 +37,7 @@ export const Results: React.FC<ResultsProps> = ({
 
   const onExit = () => {
 
-    navigate("/");
+    navigate("/Home");
     onClose();
   };
 
@@ -50,7 +50,7 @@ export const Results: React.FC<ResultsProps> = ({
 
   if (isOpen) {
     return createPortal(
-      <div className={`" w-full h-full absolute left-0 top-0 px-6  bg-black `}>
+      <div className={`" w-full h-full absolute left-0 top-0 px-6  bg-black z-10`}>
         <div className="relative w-full h-full flex justify-center items-center ">
           <div className="text-center font-[18px] bg-white px-7 py-10 rounded-2xl relative w-full">
             <div className="mb-2">

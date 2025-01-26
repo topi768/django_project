@@ -10,18 +10,22 @@ type Cat = {
 };
 interface ImgGameProps {
   className?: string;
-  onFoundCat: (countFoundedCats: number, isFoundAllCat: boolean) => void;
+  onFoundCat: (countFoundedCats: number, isFoundAllCat: boolean, catsCoordinatesProps: Cat[]) => void;
   catsCoordinatesProps: Cat[];
+  src: string,
+  onContainerRefReady?: (ref: React.RefObject<HTMLDivElement>) => void; // Коллбэк для передачи рефа наверх
 }
 
 export const ImgGame: React.FC<ImgGameProps> = ({
   className,
   onFoundCat,
   catsCoordinatesProps,
+  src,
+  onContainerRefReady
 }) => {
   const [catsCoordinates, setCatsCoordinates] =
     useState<Cat[]>(catsCoordinatesProps);
-  const [countCat] = useState<number>(catsCoordinates?.length);
+  // const [countCat, setCountCat] = useState<number>(0);
   const [countFoundedCats, setCountFoundedCats] = useState<number>(0);
   const [isFoundAllCat, setIsFoundAllCat] = useState<boolean>(false);
   type CatDisplay = {
@@ -38,29 +42,26 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   >([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (onContainerRefReady) {
+      onContainerRefReady(containerRef); // Передаем реф наверх
+    }
+  }, [onContainerRefReady]);
+
   const isVisibleOnWindow = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (cat: Cat, xOffsetpx: number, yOffsetpx: number) => {
-      // const windowWidth = window.innerWidth;
-      // const windowHeight = window.innerHeight;
-
-      // const xOffset = (xOffsetpx * 100) / windowWidth;
-      // const yOffset = (yOffsetpx * 100) / windowHeight;
-
-      // if (xOffset + cat.width + xOffset > 0) {
-      //   return false;
-      // } else if (yOffset + cat.height > 100) {
-      //   return false;
-      // } else if (xOffset + cat.width * 2 < 0) {
-      //   return false;
-      // } else if (yOffset + cat.height * 2 < 0) {
-      //   return false;
-      // }
 
       return true;
     },
     [],
   );
+  // useEffect(() => {
+  //   if (catsCoordinates) {
+  //     setCountCat(catsCoordinates.length);
+      
+  //   }
+    
+  // }, [catsCoordinates]);
 
   // Функция перерасчета позиций
   const updatePositions = useCallback(() => {
@@ -110,28 +111,40 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       resizeObserverPositions.observe(containerRef.current);
     }
 
-    if (countFoundedCats === countCat) {
-      setIsFoundAllCat(true);
-    }
-    onFoundCat(countFoundedCats, isFoundAllCat);
+
+    onFoundCat(countFoundedCats, isFoundAllCat, catsCoordinates);
 
     return () => {
       resizeObserverPositions.disconnect();
     };
-  }, [updatePositions, countFoundedCats, countCat, onFoundCat, isFoundAllCat]);
+  }, [updatePositions, countFoundedCats, onFoundCat, isFoundAllCat]);
+
 
   const handleCatClick = (index: number) => {
-    setCatsCoordinates((prevCats) =>
-      prevCats.map((cat, i) => {
+    setCatsCoordinates((prevCats) => {
+      // Обновляем массив котов и считаем количество найденных
+      const updatedCats = prevCats.map((cat, i) => {
         if (i === index && !cat.isFind) {
-          setCountFoundedCats((prev) => prev + 1);
-
-          return { ...cat, isFind: true };
+          return { ...cat, isFind: true }; // Обновляем кота как найденного
         }
-
-        return cat;
-      }),
-    );
+        return cat; // Остальные коты без изменений
+      });
+  
+      // Считаем количество найденных котов
+      const foundCount = updatedCats.filter((cat) => cat.isFind).length;
+      const countCat = updatedCats.length;
+      // Обновляем счетчик найденных котов
+      setCountFoundedCats(foundCount);
+  
+  
+      // Проверяем, найдены ли все коты
+      if (foundCount === countCat && countCat !== 0) {
+        setIsFoundAllCat(true);
+      }
+      
+      return updatedCats;
+    });
+    
   };
 
   return (
@@ -140,10 +153,9 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       className={`relative w-full h-full flex justify-center items-center overflow-hidden ${className}`}
     >
       <img
-        src="/src/assets/cats.webp"
-        // src="/src/assets/cats2.png"
+        src={src}
         alt="Cat"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover "
       />
 
       {positionsCatsOnDisplay.map((cat, index) => (
@@ -157,6 +169,8 @@ export const ImgGame: React.FC<ImgGameProps> = ({
             left: `${cat.x}px`,
             width: `${cat.width}px`,
             height: `${cat.height}px`,
+            border : "1px solid white",
+            zIndex: 1
             // transform: "translate(-50%, -50%)",
           }}
         >
