@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from django.contrib.auth import get_user_model
-from .models import UserAccount,ImageWithCoordinates,  UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
+from .models import UserAccount,Achievement, ImageWithCoordinates,  UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
 from rest_framework.views import APIView
 
 
@@ -50,12 +50,19 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         return user
 
 
+class AchievementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Achievement
+        fields = ('id', 'name', 'description')
+
 class UserAccountInfoSerializer(serializers.ModelSerializer):
+    achievements = AchievementSerializer(many=True)  # Включаем достижения
+
     class Meta:
         model = UserAccountInfo
         fields = (
             'email', 'name', 'country', 'city', 'interests',
-            'phone', 'date_of_birth'
+            'phone', 'date_of_birth', 'achievements'
         )
 
 class CountryCodeAndCountryNameSerializer(serializers.ModelSerializer):
@@ -69,12 +76,11 @@ class CityAndCountryCodeSerializer(serializers.ModelSerializer):
         fields = ('country_code', 'city')
 
 class ImageWithCoordinatesSerializer(serializers.ModelSerializer):
-    width = serializers.IntegerField()
-    height = serializers.IntegerField()
+
     level = serializers.IntegerField()
     class Meta:
         model = ImageWithCoordinates
-        fields = ['id', 'image', 'coordinates', 'created_at', 'width', 'height', 'level']
+        fields = ['id', 'image', 'coordinates', 'created_at', 'level']
 
 
 

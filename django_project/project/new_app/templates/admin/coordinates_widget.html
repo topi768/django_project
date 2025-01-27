@@ -1,9 +1,93 @@
-<textarea name="{{ widget.name }}" cols="{{ widget.attrs.cols }}" rows="{{ widget.attrs.rows }}" 
-          class="vLargeTextField">{{ widget.value|default_if_none:"" }}</textarea>
-<p>Введите массив координат в формате JSON:</p>
-<pre>
-[
-    { "x": 10, "y": 32, "width": 10, "height": 4 },
-    { "x": 10, "y": 42, "width": 20, "height": 5 }
-]
-</pre>
+<div class="coordinates-widget-container">
+    <label for="{{ widget.attrs.id }}" class="coordinates-label">Координаты</label>
+    <textarea
+      name="{{ widget.name }}"
+      id="{{ widget.attrs.id }}"
+      cols="{{ widget.attrs.cols }}"
+      rows="{{ widget.attrs.rows }}"
+      class="vLargeTextField coordinates-textarea"
+    >{{ widget.value|default_if_none:"" }}</textarea>
+  
+    <div class="coordinates-hint">
+      <p>Введите массив  wrwrrw3rw3rкоординат в формате JSON:</p>
+      <pre>
+  [
+      { "x": 10, "y": 32, "width": 10, "height": 4 },
+      { "x": 10, "y": 42, "width": 20, "height": 5 }
+  ]
+      </pre>
+    </div>
+  </div>
+  
+  <style>
+    .coordinates-widget-container {
+      margin: 20px 0;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+  
+    .coordinates-widget-container:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+  
+    .coordinates-label {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      display: block;
+    }
+  
+    .coordinates-textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      resize: vertical;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  
+    .coordinates-textarea:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+      outline: none;
+    }
+  
+    .coordinates-hint {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #fff;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #555;
+      animation: fadeIn 0.3s ease-out;
+    }
+  
+    .coordinates-hint pre {
+      background: #f7f7f7;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 13px;
+      color: #333;
+      overflow-x: auto;
+    }
+  
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  

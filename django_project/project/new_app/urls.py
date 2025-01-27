@@ -15,6 +15,9 @@ urlpatterns = [
     path('api/images/', views.get_images_with_coordinates, name='get-images'),
     path('api/upload/', views.upload_image, name='upload-image'),
     path('api/update-profile/', views.user_profile_update, name='update-profile'),
+    path('api/get-levels/', views.get_levels, name='get-levels'),
 
+    path('add-findcats/<int:user_id>/', views.add_find_cats, name='add_findcats'),
+    path('add-points/<int:user_id>/', views.add_points, name='add_points'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

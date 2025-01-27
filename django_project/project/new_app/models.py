@@ -57,6 +57,14 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+class Achievement(models.Model):
+    name = models.CharField(max_length=255)  # Название достижения
+    description = models.TextField(blank=True, null=True)  # Описание достижения
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
+
+    def __str__(self):
+        return self.name
+
 
 class UserAccountInfo(models.Model):
     user = models.OneToOneField(
@@ -71,6 +79,15 @@ class UserAccountInfo(models.Model):
     interests = models.TextField(blank=True, null=True)  # Хранение интересов как строка с разделителями
     phone = models.CharField(max_length=15, blank=True, null=True)  # Необязательное поле для телефона
     date_of_birth = models.DateField(blank=True, null=True)  # Необязательное поле для даты рождения
+
+    # game
+    countFindCats = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
+    rank = models.IntegerField(default=0)
+
+    # Связь с достижениями
+    achievements = models.ManyToManyField(Achievement, related_name="users", blank=True)
+
 
     def __str__(self):
         return f"Account info for {self.user.email}"

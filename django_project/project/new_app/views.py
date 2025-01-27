@@ -5,8 +5,8 @@ from .models import UserAccountInfo
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import UserAccountInfo, UserAccount, CountryCodeAndCountryName, CityAndCountryCode
-from .serializers import UserAccountInfoSerializer, UserProfileUpdateSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
+from .models import UserAccountInfo, ImageWithCoordinates, CountryCodeAndCountryName, CityAndCountryCode
+from .serializers import UserAccountInfoSerializer,ImageWithCoordinatesSerializer,  UserProfileUpdateSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
@@ -95,3 +95,50 @@ def user_profile_update(request):
         serializer.save()  # Обновляем информацию пользователя
         return Response(serializer.data, status=200)
     return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+
+def get_levels(request):
+    serializer = ImageWithCoordinatesSerializer(ImageWithCoordinates.objects.all(), many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_find_cats(request, user_id):
+    try:
+        # Извлекаем количество, на которое нужно увеличить количество найденных котов
+        increment_value = request.data.get('increment', 1)  # Если не передано, увеличиваем на 1 по умолчанию
+
+        # Получаем пользователя
+        user_info = UserAccountInfo.objects.get(user_id=user_id)
+        
+        # Добавляем переданное количество найденных котов
+        print(request.data)
+        user_info.countFindCats += increment_value
+        user_info.save()
+
+        return Response({
+            "message": "FindCats updated successfully",
+            "countFindCats": user_info.countFindCats
+        }, status=status.HTTP_200_OK)
+    
+    except UserAccountInfo.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_points(request, user_id):
+    try:
+        # Получаем пользователя
+        user_info = UserAccountInfo.objects.get(user_id=user_id)
+        
+        # Добавляем 10 очков (например) к существующим очкам
+        user_info.points += 10
+        user_info.save()
+
+        return Response({"message": "Points updated successfully", "points": user_info.points}, status=status.HTTP_200_OK)
+    
+    except UserAccountInfo.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
