@@ -88,6 +88,19 @@ class UserAccountInfo(models.Model):
     # Связь с достижениями
     achievements = models.ManyToManyField(Achievement, related_name="users", blank=True)
 
+    def add_achievement(self):
+        if self.countFindCats >= 5 and not self.achievements.filter(name="Ищейка").exists():
+            # Добавляем достижение "Ищейка" (найти 5 котов)
+            achievement = Achievement.objects.get(name="Ищейка")
+            self.achievements.add(achievement)
+        if self.countFindCats >= 10 and not self.achievements.filter(name="Ищейка+").exists():
+            # Добавляем достижение "Ищейка+" (найти 10 котов)
+            achievement = Achievement.objects.get(name="Ищейка+")
+            self.achievements.add(achievement)
+        if self.countFindCats >= 20 and not self.achievements.filter(name="Ищейка++").exists():
+            # Добавляем достижение "Ищейка++" (найти 20 котов)
+            achievement = Achievement.objects.get(name="Ищейка++")
+            self.achievements.add(achievement)
 
     def __str__(self):
         return f"Account info for {self.user.email}"

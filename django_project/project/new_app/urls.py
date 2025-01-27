@@ -19,5 +19,8 @@ urlpatterns = [
 
     path('add-findcats/<int:user_id>/', views.add_find_cats, name='add_findcats'),
     path('add-points/<int:user_id>/', views.add_points, name='add_points'),
+
+    path('achievements/', views.get_all_achievements, name='get_all_achievements'),
+    path('user/<int:user_id>/achievements/', views.get_user_achievements, name='get_user_achievements'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

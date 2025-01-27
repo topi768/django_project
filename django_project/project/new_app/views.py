@@ -5,7 +5,7 @@ from .models import UserAccountInfo
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import UserAccountInfo, ImageWithCoordinates, CountryCodeAndCountryName, CityAndCountryCode
+from .models import UserAccountInfo, Achievement, ImageWithCoordinates, CountryCodeAndCountryName, CityAndCountryCode
 from .serializers import UserAccountInfoSerializer,ImageWithCoordinatesSerializer,  UserProfileUpdateSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
@@ -118,9 +118,13 @@ def add_find_cats(request, user_id):
         user_info.countFindCats += increment_value
         user_info.save()
 
+        # Добавляем достижения, если условия выполнены
+        user_info.add_achievement()
+
         return Response({
             "message": "FindCats updated successfully",
-            "countFindCats": user_info.countFindCats
+            "countFindCats": user_info.countFindCats,
+            "achievements": [achievement.name for achievement in user_info.achievements.all()]  # Возвращаем список достижений
         }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
@@ -145,5 +149,37 @@ def add_points(request, user_id):
             "countFindCats": user_info.countFindCats
         }, status=status.HTTP_200_OK)
     
+    except UserAccountInfo.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Путь доступен всем
+def get_all_achievements(request):
+    achievements = Achievement.objects.all()
+    achievement_data = [
+        {"id": achievement.id, "name": achievement.name, "description": achievement.description}
+        for achievement in achievements
+    ]
+    return Response(achievement_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Этот путь доступен только для авторизованных пользователей
+def get_user_achievements(request, user_id):
+    try:
+        # Получаем информацию о пользователе
+        user_info = UserAccountInfo.objects.get(user_id=user_id)
+
+        # Получаем все достижения, связанные с этим пользователем
+        achievements = user_info.achievements.all()
+
+        achievement_data = [
+            {"id": achievement.id, "name": achievement.name, "description": achievement.description}
+            for achievement in achievements
+        ]
+        
+        return Response(achievement_data, status=status.HTTP_200_OK)
+
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
