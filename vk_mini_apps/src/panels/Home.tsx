@@ -9,25 +9,20 @@ import { Avatar } from "../components/Avatar";
 import { Footer } from "../components/Footer";
 import { TimerReverse } from "../components/TimerReverse";
 import { ListItem } from "../components/ui/ListItem";
-import { useUser } from "../hooks/useUser.ts";
 import { useNavigate } from "react-router-dom";
 import { useGetUserData } from "@/hooks/useUser"; 
 import { useCountryList, useCitiesList } from "../hooks/useWorldInfo.ts";
-
+import { useUserStats } from "../hooks/useUser.ts";
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
 
 export const Home: FC<HomeProps> = ({ id }) => {
+  
   const { data: userData, isLoading, isError, error } = useGetUserData(Number(localStorage.getItem("user_id") ));
   const { data: countryList } = useCountryList();
-
-  useEffect(() => {
-    if (userData){
-      console.log("userData:", userData); 
-
-    }
-  }, [userData]);
+  const [country, setCountry] = useState<string>("");
+ 
   
   function getAgeFromBirthDate(birthDateString: string): number {
     // Преобразуем строку в объект даты
@@ -56,54 +51,104 @@ export const Home: FC<HomeProps> = ({ id }) => {
     return age;
   
   }
+  interface RankingDataItem {
+    iconName: string;
+    route: string;
+    text: string;
+    value: number;
+  }
+
   const navigate = useNavigate();
-  const routeNavigator = useRouteNavigator();
-  const { userResponse } = useUser();
-  const [country, setCountry] = useState<string>("");
-  useEffect(() => {
-    if (countryList) {
-      const country = countryList.find((country) => country.country_code === userData?.country)?.country_name;
-      if (country) {
-        setCountry(country);
-        console.log("country:", country);
-        
-      }
-    }
-  }, [countryList, userData]);
+
+  const { data: userStat , refetch} = useUserStats(Number(localStorage.getItem("user_id")));
+
+
   const value = {
     score: 0,
     userPosition: 0,
     catsFoundCount: 0,
     achievementsCount: 0,
   };
-  const rankingData = [
+const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
+  
+  useEffect(() => {
+    if (userStat) {
+      setRankingData(
+        [
+          {
+            iconName: "score",
+            route: "",
+            text: "Счет",
+            value: userStat.points,
+          },
+          {
+            iconName: "top",
+            route: "",
+            text: "Место в рейтинге",
+            value: value?.userPosition,
+          },
+          {
+            iconName: "score",
+            route: "",
+            text: "Найдено котиков",
+            value: userStat.countFindCats,
+          },
+          {
+            iconName: "achievements",
+            route: "",
+            text: "Открыто достижений",
+            value: value?.achievementsCount,
+          }
+          
+        
+        ]
+      )
+    }
+  }, [userStat]);
+
+  useEffect(() => {
+    // Обновление данных при монтировании компонента или возврате на страницу
+    refetch();
+  }, [refetch]);
+  useEffect(() => {
+    if (countryList) {
+      const country = countryList.find((country) => country.country_code === userData?.country)?.country_name;
+      if (country) {
+        setCountry(country);
+        
+      }
+    }
+  }, [countryList, userData]);
 
 
-    {
-      iconName: "score",
-      route: "",
-      text: "Счет",
-      value: value?.score,
-    },
-    {
-      iconName: "top",
-      route: "",
-      text: "Место в рейтинге",
-      value: value?.userPosition,
-    },
-    {
-      iconName: "score",
-      route: "",
-      text: "Найдено котиков",
-      value: value?.catsFoundCount,
-    },
-    {
-      iconName: "achievements",
-      route: "",
-      text: "Открыто достижений",
-      value: value?.achievementsCount,
-    },
-  ];
+  // const rankingData = [
+
+
+  //   {
+  //     iconName: "score",
+  //     route: "",
+  //     text: "Счет",
+  //     value: 0,
+  //   },
+  //   {
+  //     iconName: "top",
+  //     route: "",
+  //     text: "Место в рейтинге",
+  //     value: value?.userPosition,
+  //   },
+  //   {
+  //     iconName: "score",
+  //     route: "",
+  //     text: "Найдено котиков",
+  //     value: 0,
+  //   },
+  //   {
+  //     iconName: "achievements",
+  //     route: "",
+  //     text: "Открыто достижений",
+  //     value: value?.achievementsCount,
+  //   },
+  // ];
 
   return (
     <>

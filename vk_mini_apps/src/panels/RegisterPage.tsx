@@ -45,12 +45,13 @@ const {
 
 
   const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     if ( formData.phone === "" ) {
       setErrorMessage('Поле для телефона пустое');
       return
     }
 
-    e.preventDefault();
+    
     setIsRegistering(true);
     
     const country_name = countryList?.find((country) => country.country_code === formData.country)?.country_name || "";
@@ -58,6 +59,7 @@ const {
     const updatedFormData = {
       ...formData,
       country_name: country_name,
+      password: formData.password,
     };
 
     
@@ -94,6 +96,8 @@ const {
         
         if (error.response) {
           const errorField = Object.keys(error.response)[0]; // Определяем первое поле с ошибкой
+          console.log(errorField);
+          
           switch (errorField) {
             case 'email':
               setErrorMessage('Пользователь с таким email уже существует');
@@ -104,6 +108,9 @@ const {
             case 'name':
               setErrorMessage('Пользователь с таким именем уже существует');
               break;
+            case 'non_field_errors':
+              setErrorMessage('Пароли не совпадают');
+              break
             default:
               setErrorMessage('Ошибка заполнения формы');
               break;
@@ -147,7 +154,7 @@ const {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Регистрация/Вход
+          Регистрация/ <span className="cursor-pointer text-blue-500" onClick={() => navigate('/login')}>Вход</span>
         </h2>
         <form onSubmit={handleSubmit}>
           {fields.map((field) => (

@@ -9,14 +9,15 @@ const portal = document.getElementById("portal")!;
 interface PauseModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onExit: () => void; 
 }
 
-export const PauseModal: React.FC<PauseModalProps> = ({ isOpen, onClose }) => {
+export const PauseModal: React.FC<PauseModalProps> = ({ isOpen, onClose, onExit }) => {
   const routeNavigator = useRouteNavigator();
   const navigate = useNavigate();
-  const onExit = () => {
-    navigate("/home");
-  };
+  // const onExit = () => {
+  //   navigate("/home");
+  // };
 
   if (isOpen) {
     return createPortal(

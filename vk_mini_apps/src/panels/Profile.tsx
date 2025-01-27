@@ -41,11 +41,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
     const { data: citiesList } = useCitiesList(formData.country_code);
     const getAgeFromBirthDate = (birthDateString: string): number => {
         const birthDate = new Date(birthDateString);
-    /**
-     * Calculates age from a given birth date string in "YYYY-MM-DD" format
-     * @param birthDateString - String in "YYYY-MM-DD" format
-     * @returns Age in years. If the date is invalid, returns 0
-     */
+
         if (isNaN(birthDate.getTime())) {
             return 0; // Возраст не определён
         }
@@ -70,6 +66,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
             city: formData.city,
             date_of_birth: formData.date_of_birth,
         });
+        localStorage.setItem("user_data", JSON.stringify(formData));
     };
 
     const handleInputChangeCountry = (e: { value: string; label: string }) => {

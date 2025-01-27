@@ -4,9 +4,10 @@ import { Header } from "../components/Header";
 import { Spacing } from "../components/ui/Spacing";
 import { SmallButton } from "../components/ui/buttons/SmallButton";
 import { ProgressBar } from "../components/ui/ProgressBar";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import IconCheck from "@/assets/icons/check.svg";
 import { Footer } from "../components/Footer";
+import { useAchievements } from "@/hooks/game/useGameUserInfo";
 
 export interface AchievementsProps extends NavIdProps {
   fetchedUser?: UserInfo;
@@ -23,38 +24,27 @@ export const Achievements: FC<AchievementsProps> = ({ id }) => {
     max: number;
     id: number;
   }
-  const [achievementsList] = useState<AchievementsList[]>([
-    {
-      name: "Ищейка",
-      subtext: "Найдёте 5 котиков",
-      buttonText: "2 кис-кис",
-      isCompleted: false,
-      isDisabled: true,
-      current: 1,
-      max: 5,
-      id: 1,
-    },
-    {
-      name: "Ищейка",
-      subtext: "Найдёте 5 котиков",
-      buttonText: "2 кис-кис",
-      isCompleted: false,
-      isDisabled: false,
-      current: 5,
-      max: 5,
-      id: 2,
-    },
-    {
-      name: "Ищейка",
-      subtext: "Найдёте 5 котиков",
-      isCompleted: true,
-      buttonText: "",
-      current: 5,
-      max: 5,
-      id: 3,
-    },
-  ]);
+    const { data: achievements, isLoading, isError, error } = useAchievements();
 
+  const [achievementsList, setAchievementsList] = useState<AchievementsList[]>([
+
+  ]);
+  useEffect(() => {
+    if (achievements) {
+      setAchievementsList(
+        achievements.map((item) => ({
+          name: item.name,
+          subtext: item.description,
+          buttonText: "2 кис-кис",
+          isCompleted:false,
+          isDisabled: true,
+          current: 0,
+          max: 5,
+          id: item.id
+        }))
+      );
+      }
+  })
   return (
     <Panel id={id} className="w-full">
       <div className="px-6">

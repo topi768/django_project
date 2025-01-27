@@ -9,13 +9,14 @@ import { PauseModal } from "../components/GameScreen/Pause";
 import { Results } from "../components/GameScreen/Results";
 import { HintCircle } from "../components/GameScreen/HintCircle";
 import { useGetLvls } from "../hooks/useGetLvls";
+import { Win } from "../components/GameScreen/Win";
 import {
   Panel,
   NavIdProps,
 
 } from "@vkontakte/vkui";
 import { ImgGame } from "../components/GameScreen/Img";
-import { BooleanSupportOption } from "prettier";
+import { useNavigate } from "react-router-dom";
 
 export interface OnboardingProps extends NavIdProps {
   fetchedUser?: UserInfo;
@@ -40,36 +41,41 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   const [isOpenOnboarding, setIsOpenOnboarding] = useState<boolean >(
     localStorage.getItem("isOpenOnboarding") === "true"
   );
+  const SECONDS_GAME = 30
   const [isOpenPrestartModal, setIsOpenPrestartModal] = useState(false);
   const [isOpenPausetModal, setIsOpenPauseModal] = useState(false);
-  const [startSeconds, setStartSeconds] = useState(300000);
+  const [startSeconds, setStartSeconds] = useState(SECONDS_GAME);
   const [isOpenResults, setIsOpenResults] = useState(false);
-  const [countFindCast, setCountFindCats] = useState(0);
+  const [countFoundedCats, setCountFindCats] = useState(0);
   const [srcImg, setSrcImg] = useState<string>("");
   const [posHintCircleX, setPosHintCircleX] = useState(20);
   const [posHintCircleY, setPosHintCircleY] = useState(20);
   const [isShowCircle, setIsShowCircle] = useState(false);
+  const [curLevel, setCurLevel] = useState(0);
+  const [isWin, setIsWin] = useState(false);
+  const navigator = useNavigate();
   const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
   const { data: levels, error, isLoading: isGetLvlsLoading, isError } = useGetLvls();
+
   useEffect(() => {
     if (levels) {
       catsCoords.length = 0;
-      for (let i = 0; i < levels[key].coordinates.length; i++) {
+      for (let i = 0; i < levels[curLevel].coordinates.length; i++) {
         catsCoords.push({
-          x: levels[key].coordinates[i].x,
-          width: levels[key].coordinates[i].width,
-          height: levels[key].coordinates[i].height,
-          y: levels[key].coordinates[i].y,
+          x: levels[curLevel].coordinates[i].x,
+          width: levels[curLevel].coordinates[i].width,
+          height: levels[curLevel].coordinates[i].height,
+          y: levels[curLevel].coordinates[i].y,
           id: i + 1,
           isFind: false,
           
         });
       }
-      setSrcImg(levels[key].image);
+      setSrcImg(levels[curLevel].image);
     }
 
-  },[levels])
+  },[levels, curLevel])
 
 
   const handleClickHint = () => {
@@ -117,9 +123,34 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
 
   const resetGame = () => {
+
+    // Сбросить ключ, чтобы вызвать перерисовку компонента
     setKey((prevKey) => prevKey + 1);
-    setIsOpenResults(false);
+  
+    // Сбросить состояние
+    setCountFindCats(0);  // Сбросить счетчик найденных кошек
+    setCountHints(3);  // Сбросить количество подсказок
+    setCatsCoordinates([]);  // Очистить текущие координаты кошек
+  
+    // Переинициализировать координаты кошек и изображение для текущего уровня
+    if (levels) {
+      const newCatsCoords = levels[curLevel].coordinates.map((coordinate, index) => ({
+        x: coordinate.x,
+        width: coordinate.width,
+        height: coordinate.height,
+        y: coordinate.y,
+        id: index + 1,
+        isFind: false,
+      }));
+      setCatsCoordinates(newCatsCoords);  // Установить обновленные координаты для текущего уровня
+      setSrcImg(levels[curLevel].image);  // Установить изображение для текущего уровня
+    }
+  
+    // Сбросить таймер и другие элементы UI
+    setStartSeconds(SECONDS_GAME);  // Сбросить таймер или установить ваше начальное значение
+    setIsOpenResults(false);  // Закрыть модальное окно результатов
   };
+  
 
   const timerEL = useRef<HTMLDivElement>(null);
 
@@ -193,6 +224,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
 
   const onFoundCat = (countFoundedCats: number, isFoundAllCat: boolean, catsCoordinatesProps: Cat[]) => {
+    console.log("onFoundCat");
     
     setCatsCoordinates(catsCoordinatesProps);
 
@@ -203,6 +235,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
     }
   };
 
+  
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -210,7 +243,29 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
     containerRef.current = ref.current;
     
   };
+  const handleContinue = () => {
+    if (levels?.length === curLevel + 1) {
+      setIsWin(true);
+      return
+    }
+    
+    setKey((prevKey) => {
+      const newKey = prevKey + 1;
 
+      return newKey;
+    });
+    setIsOpenResults(false);
+    console.log("handleContinue");
+    
+    setCurLevel(curLevel + 1);
+  };
+  const handleExit = () => {
+    console.log("handleExit");
+    
+
+    navigator('/home')
+
+  }
   return (
     <Panel key={key} id={id} className=" h-full relative  ">
       <div className="w-full h-screen  bg-gray-950 flex justify-center items-center ">
@@ -231,6 +286,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
         <PauseModal
           onClose={handleClosePauseModel}
           isOpen={isOpenPausetModal}
+          onExit={handleExit}
         />
         <GameTimer
           className="absolute top-9 left-1/2 -translate-x-1/2 duration-300 translate-y-5"
@@ -263,14 +319,15 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
         <Results
           isOpen={isOpenResults}
           results={{
-            score: countFindCast * 257,
-            amountCat: countFindCast - 1,
+            amountCat: countFoundedCats,
             timeLeft: timerEL.current?.textContent,
           }}
           onClose={() => setIsOpenResults(false)}
           OnRepeatGame={resetGame}
+          onContinue={handleContinue}
         />
-        <HintCircle countHints={countHints} pointCordX={posHintCircleX} pointCordY={posHintCircleY} containerRef={containerRef} isVisivle={isShowCircle} />
+      <Win isWin={isWin}/>
+      <HintCircle countHints={countHints} pointCordX={posHintCircleX} pointCordY={posHintCircleY} containerRef={containerRef} isVisivle={isShowCircle} />
       </div>
     </Panel>
   );

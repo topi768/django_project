@@ -2,6 +2,7 @@ import { useQuery, useMutation, UseMutationResult  } from "@tanstack/react-query
 import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher } from "../api/appInfo/user";
 import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
 import { useState } from "react";
+import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
 
 export const useUser = () => {
   const { data: userResponse } = useQuery({
@@ -91,5 +92,18 @@ export const useUpdateUserProfile = (): UseMutationResult<
     onError: (error) => {
       console.error('Failed to update profile:', error);
     },
+  });
+};
+
+
+export const useUserStats = (userId: number) => {
+  return useQuery({
+    queryKey: ["userStats", userId],
+    queryFn: () => getUserStatsFetcher(userId),
+    retry: 3,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 };

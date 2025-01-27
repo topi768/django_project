@@ -26,6 +26,7 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   src,
   onContainerRefReady,
 }) => {
+
   const [catsCoordinates, setCatsCoordinates] = useState<Cat[]>(catsCoordinatesProps);
   const [countFoundedCats, setCountFoundedCats] = useState<number>(0);
   const [isFoundAllCat, setIsFoundAllCat] = useState<boolean>(false);
@@ -57,8 +58,8 @@ export const ImgGame: React.FC<ImgGameProps> = ({
     const containerRect = container.getBoundingClientRect();
   
     // Отступ в 5% от ширины и высоты контейнера
-    const marginX = containerRect.width * 0.05;
-    const marginY = containerRect.height * 0.05;
+    const marginX = containerRect.width * 0.15;
+    const marginY = containerRect.height * 0.15;
   
     // Видимая область контейнера с учетом отступов
     const visibleRect = {
@@ -90,13 +91,13 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   const updatePositions = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-
+  
     const { offsetWidth: containerWidth, offsetHeight: containerHeight } = container;
-    const imgAspectRatio = 1 / 1; // Замените на реальный аспект изображения
+    const imgAspectRatio = 1 / 1; // Пример: заменить на реальный аспект изображения
     const containerAspectRatio = containerWidth / containerHeight;
-
+  
     let imgWidth: number, imgHeight: number;
-
+  
     if (containerAspectRatio > imgAspectRatio) {
       imgWidth = containerWidth;
       imgHeight = containerWidth / imgAspectRatio;
@@ -104,10 +105,10 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       imgHeight = containerHeight;
       imgWidth = containerHeight * imgAspectRatio;
     }
-
+  
     const xOffset = (containerWidth - imgWidth) / 2;
     const yOffset = (containerHeight - imgHeight) / 2;
-
+  
     const newPositions = catsCoordinates.map((cat) => {
       const catDisplay = {
         x: xOffset + (cat.x / 100) * imgWidth,
@@ -118,14 +119,15 @@ export const ImgGame: React.FC<ImgGameProps> = ({
         isFind: cat.isFind,
         isVisible: false, // Видимость вычисляем ниже
       };
-
+  
       catDisplay.isVisible = isVisibleOnWindow(catDisplay); // Определяем видимость кота
-
+  
       return catDisplay;
     });
-
+  
     setPositionsCatsOnDisplay(newPositions);
   }, [catsCoordinates, isVisibleOnWindow]);
+  
 
   useEffect(() => {
     updatePositions();
@@ -135,12 +137,19 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       resizeObserverPositions.observe(containerRef.current);
     }
 
-    onFoundCat(countFoundedCats, isFoundAllCat, catsCoordinates);
 
     return () => {
       resizeObserverPositions.disconnect();
     };
   }, [updatePositions, countFoundedCats, onFoundCat, isFoundAllCat]);
+
+  useEffect(() => {
+    // Вызываем onFoundCat только если количество найденных котов или состояние "все коты найдены" изменилось
+    if (countFoundedCats > 0 || isFoundAllCat) {
+      onFoundCat(countFoundedCats, isFoundAllCat, catsCoordinates);
+    }
+  }, [countFoundedCats, isFoundAllCat, catsCoordinates, onFoundCat]);
+
 
   const handleCatClick = (index: number) => {
     setCatsCoordinates((prevCats) => {
@@ -152,14 +161,14 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       });
 
       const foundCount = updatedCats.filter((cat) => cat.isFind).length;
-      const countCat = updatedCats.length;
+      const countCat = updatedCats.length; //???
       
-      const visibleCat = positionsCatsOnDisplay.filter((cat) => cat.isVisible).length;
-      console.log(visibleCat, foundCount);
+      const visibleCat = positionsCatsOnDisplay.filter((cat) => cat.isVisible).length ;
+      
       
       setCountFoundedCats(foundCount);
       
-      if (foundCount ===  visibleCat && countCat !== 0) {
+      if (foundCount >=  visibleCat && countCat !== 0) {
         setIsFoundAllCat(true);
       }
 

@@ -14,11 +14,11 @@ import RegisterPage from "./panels/RegisterPage";
 import { Achievements } from "./panels/Achievements";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Header } from "./components/Header";
-import { Footer } from "@/components/Footer";
+
 import "./App.css";
 import {useAuthStore} from "@/store/authStore"
 import { StrictMode } from "react";
+import Login from "./panels/Login";
 
 const App = () => {
 
@@ -89,6 +89,7 @@ const App = () => {
           />
           {/* Страница регистрации */}
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
 
           {/* Перенаправление по умолчанию */}
           <Route
@@ -100,7 +101,7 @@ const App = () => {
         {/* {isAuth && <Footer className="bg-gray-200" />} */}
       </Router>
     </QueryClientProvider>
-    //{/* </StrictMode> */}
+    //  </StrictMode> 
   );
 };
 
