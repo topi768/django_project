@@ -53,23 +53,38 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   const isVisibleOnWindow = useCallback((cat: CatDisplay) => {
     const container = containerRef.current;
     if (!container) return false;
-
+  
     const containerRect = container.getBoundingClientRect();
-
+  
+    // Отступ в 5% от ширины и высоты контейнера
+    const marginX = containerRect.width * 0.05;
+    const marginY = containerRect.height * 0.05;
+  
+    // Видимая область контейнера с учетом отступов
+    const visibleRect = {
+      left: marginX,
+      top: marginY,
+      right: containerRect.width - marginX,
+      bottom: containerRect.height - marginY,
+    };
+  
+    // Координаты кота
     const catRect = {
       left: cat.x,
       top: cat.y,
       right: cat.x + cat.width,
       bottom: cat.y + cat.height,
     };
-
+  
+    // Проверяем, находится ли кот в пределах видимой области
     return (
-      catRect.right >= 0 &&
-      catRect.left <= containerRect.width &&
-      catRect.bottom >= 0 &&
-      catRect.top <= containerRect.height
+      catRect.right >= visibleRect.left &&
+      catRect.left <= visibleRect.right &&
+      catRect.bottom >= visibleRect.top &&
+      catRect.top <= visibleRect.bottom
     );
   }, []);
+  
 
   // Функция перерасчета позиций
   const updatePositions = useCallback(() => {
@@ -105,7 +120,7 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       };
 
       catDisplay.isVisible = isVisibleOnWindow(catDisplay); // Определяем видимость кота
-      
+
       return catDisplay;
     });
 
@@ -140,7 +155,8 @@ export const ImgGame: React.FC<ImgGameProps> = ({
       const countCat = updatedCats.length;
       
       const visibleCat = positionsCatsOnDisplay.filter((cat) => cat.isVisible).length;
-
+      console.log(visibleCat, foundCount);
+      
       setCountFoundedCats(foundCount);
       
       if (foundCount ===  visibleCat && countCat !== 0) {
