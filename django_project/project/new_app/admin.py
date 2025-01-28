@@ -1,16 +1,42 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.forms import widgets
 from django import forms
-from .models import ImageWithCoordinates, Achievement
+from django.forms import widgets
+from .models import ImageWithCoordinates, Achievement, UserAccount, UserAccountInfo
 
+# Кастомная форма для пользователя, если хотите изменить или добавить поля
+class UserAccountForm(forms.ModelForm):
+    class Meta:
+        model = UserAccount
+        fields = ['email', 'name', 'is_staff', 'is_active', 'is_superuser']
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'vTextField'}),
+            'name': forms.TextInput(attrs={'class': 'vTextField'}),
+        }
+
+@admin.register(UserAccount)
+class UserAccountAdmin(admin.ModelAdmin):
+    form = UserAccountForm
+    list_display = ('email', 'name', 'is_staff', 'is_active', 'is_superuser', 'last_login')
+    search_fields = ('email', 'name')
+    list_filter = ('is_staff', 'is_active', 'is_superuser')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset
+
+    # Можно добавить методы для редактирования или удаления
+    def delete_model(self, request, obj):
+        obj.delete()
+
+# AchievementAdmin для модели Achievement
+@admin.register(Achievement)
 class AchievementAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'created_at')  # Поля, которые будут отображаться в списке
+    list_display = ('name', 'description', 'created_at', 'maxProgress')  # Поля, которые будут отображаться в списке
     search_fields = ('name',)  # Поле для поиска
     list_filter = ('created_at',)  # Фильтрация по дате создания
 
-# Регистрируем модель Achievement в админке
-admin.site.register(Achievement, AchievementAdmin)
+# Кастомный виджет для редактирования coordinates
 class CoordinatesWidget(widgets.Textarea):
     """
     Кастомный виджет для редактирования coordinates с помощью Textarea.
@@ -25,13 +51,12 @@ class ImageWithCoordinatesForm(forms.ModelForm):
     """
     Форма для модели ImageWithCoordinates с кастомным виджетом для coordinates.
     """
-    # class Meta:
-    #     model = ImageWithCoordinates
-    #     fields = '__all__'
-    #     widgets = {
-    #         'coordinates': CoordinatesWidget(attrs={'rows': 10, 'cols': 60}),
-    #     }
-
+    class Meta:
+        model = ImageWithCoordinates
+        fields = '__all__'
+        widgets = {
+            'coordinates': CoordinatesWidget(attrs={'rows': 10, 'cols': 60}),
+        }
 
 @admin.register(ImageWithCoordinates)
 class ImageWithCoordinatesAdmin(admin.ModelAdmin):

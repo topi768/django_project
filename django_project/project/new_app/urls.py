@@ -22,5 +22,7 @@ urlpatterns = [
 
     path('achievements/', views.get_all_achievements, name='get_all_achievements'),
     path('user/<int:user_id>/achievements/', views.get_user_achievements, name='get_user_achievements'),
+
+    path("get-user-stats/<int:user_id>/", views.get_user_stats, name="get_user_stats"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

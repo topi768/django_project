@@ -9,13 +9,13 @@ class UserRegistrationTestCase(APITestCase):
 
     def test_successful_registration(self):
         """Тест успешной регистрации нового пользователя"""
-        print(Fore.CYAN + "Тест успешной регистрации нового пользователя")  # Заголовок теста в голубом цвете
+        print(Fore.CYAN + "Тест  регистрации нового пользователя")  
 
         data = {
             "email": "topi768@inbox.ru",
             "name": "John Doe",
-            "password": "SecureP@ss123",
-            "re_password": "SecureP@ss123",
+            "password": "SecureP@ss1234",
+            "re_password": "SecureP@ss1234",
             "country": "USA",
             "city": "New York",
             "phone": "1234567890",

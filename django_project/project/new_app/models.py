@@ -60,6 +60,8 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 class Achievement(models.Model):
     name = models.CharField(max_length=255)  # Название достижения
     description = models.TextField(blank=True, null=True)  # Описание достижения
+    currentProgress = models.IntegerField(default=0)  # Текущее прогресс достижения
+    maxProgress = models.IntegerField(default=5)  # Максимальный прогресс достижения
     created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
 
     def __str__(self):
@@ -85,22 +87,11 @@ class UserAccountInfo(models.Model):
     points = models.IntegerField(default=0)
     rank = models.IntegerField(default=0)
 
+    kisKis = models.IntegerField(default=100)
     # Связь с достижениями
     achievements = models.ManyToManyField(Achievement, related_name="users", blank=True)
 
-    def add_achievement(self):
-        if self.countFindCats >= 5 and not self.achievements.filter(name="Ищейка").exists():
-            # Добавляем достижение "Ищейка" (найти 5 котов)
-            achievement = Achievement.objects.get(name="Ищейка")
-            self.achievements.add(achievement)
-        if self.countFindCats >= 10 and not self.achievements.filter(name="Ищейка+").exists():
-            # Добавляем достижение "Ищейка+" (найти 10 котов)
-            achievement = Achievement.objects.get(name="Ищейка+")
-            self.achievements.add(achievement)
-        if self.countFindCats >= 20 and not self.achievements.filter(name="Ищейка++").exists():
-            # Добавляем достижение "Ищейка++" (найти 20 котов)
-            achievement = Achievement.objects.get(name="Ищейка++")
-            self.achievements.add(achievement)
+
 
     def __str__(self):
         return f"Account info for {self.user.email}"

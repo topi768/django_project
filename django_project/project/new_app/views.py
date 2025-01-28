@@ -130,6 +130,17 @@ def add_find_cats(request, user_id):
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+RANKS = [
+    {"name": "Сержант Кискисенко", "min_points": 0},
+    {"name": "Исследователь", "min_points": 100},
+    {"name": "Охотник", "min_points": 200},
+    {"name": "Мастер Котов", "min_points": 300},
+    {"name": "Легенда Котов", "min_points": 500},
+    {"name": "Кото-Бог", "min_points": 700},
+    {"name": "Великий Кото-Властелин", "min_points": 1000},
+]
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def add_points(request, user_id):
@@ -158,7 +169,7 @@ def add_points(request, user_id):
 def get_all_achievements(request):
     achievements = Achievement.objects.all()
     achievement_data = [
-        {"id": achievement.id, "name": achievement.name, "description": achievement.description}
+        {"id": achievement.id, "name": achievement.name, "description": achievement.description, "currentProgress": achievement.currentProgress, "maxProgress": achievement.maxProgress}
         for achievement in achievements
     ]
     return Response(achievement_data, status=status.HTTP_200_OK)
@@ -181,5 +192,24 @@ def get_user_achievements(request, user_id):
         
         return Response(achievement_data, status=status.HTTP_200_OK)
 
+    except UserAccountInfo.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_stats(request, user_id):
+    try:
+        # Получаем информацию о пользователе
+        user_info = UserAccountInfo.objects.get(user_id=user_id)
+        
+        # Возвращаем статистику пользователя
+        return Response({
+            "message": "User stats retrieved successfully",
+            "countFindCats": user_info.countFindCats,
+            "points": user_info.points,
+            "kisKis": user_info.kisKis
+        }, status=status.HTTP_200_OK)
+    
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
