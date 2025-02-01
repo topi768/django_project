@@ -22,6 +22,9 @@ const Login: React.FC = () => {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    console.log(localStorage.getItem('user_data'));
+    
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -38,7 +41,11 @@ const Login: React.FC = () => {
       newErrors.email = "Некорректный формат электронной почты.";
       valid = false;
     }
-
+    
+    if (formData.password != JSON.parse(localStorage.getItem('user_data')).password) {
+        newErrors.password = "Неверный пароль.";
+        valid = false;
+    }
     // Валидация пароля
     if (!formData.password) {
       newErrors.password = "Пароль обязателен.";

@@ -160,7 +160,7 @@ const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
             <Spacing />
             <div>
               <div className="flex relative my-7 ">
-                <Avatar className="mr-6" typeRank={7} />
+                <Avatar className="mr-6"  />
                 <div className="h-full flex flex-col gap-2">
                   <h3 className="text-[1.0625rem] mt-3 font-bold leading-[1.375rem]">
                     {userData?.name}

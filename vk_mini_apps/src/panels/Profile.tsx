@@ -87,7 +87,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                 <Header text="Профиль" />
                 <div>
                     <div className="flex relative my-7">
-                        <Avatar className="mr-6" typeRank={7} />
+                        <Avatar className="mr-6"  />
                         <div className="h-full flex flex-col gap-2 w-full">
                             <EditableText
                                 name={formData.name}

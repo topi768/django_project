@@ -59,13 +59,14 @@ const {
     const updatedFormData = {
       ...formData,
       country_name: country_name,
-      password: formData.password,
     };
 
     
     registerUser(updatedFormData, {
       onSuccess: async (createdUser) => {
-        
+        localStorage.clear()
+        localStorage.setItem("isOpenOnboarding", "true");
+
         localStorage.setItem('user_id', createdUser.id);
         setIsRegistering(false);
         console.log('Registration successful! ') ;

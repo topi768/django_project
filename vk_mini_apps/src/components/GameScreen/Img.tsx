@@ -179,7 +179,7 @@ export const ImgGame: React.FC<ImgGameProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full flex justify-center items-center overflow-hidden ${className}`}
+      className={`relative w-full h-full flex justify-center items-center overflow-hidden  ${className}`}
     >
       <img src={src} alt="Cat" className="w-full h-full object-cover " />
 
@@ -194,7 +194,7 @@ export const ImgGame: React.FC<ImgGameProps> = ({
             left: `${cat.x}px`,
             width: `${cat.width}px`,
             height: `${cat.height}px`,
-            border: "1px solid white",
+            // border: "1px solid white",
             zIndex: 1,
           }}
         >

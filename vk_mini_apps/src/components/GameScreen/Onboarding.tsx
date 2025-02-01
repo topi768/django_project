@@ -1,7 +1,7 @@
-import {} from "@vkontakte/icons";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Avatar } from "../../components/Avatar";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SmallButton } from "../ui/buttons/SmallButton";
 import { LargeButton } from "../ui/buttons/LargeButton";
 
@@ -12,6 +12,7 @@ interface OnboardingProps {
   onHighlightChange: (highlightedElement: string) => void;
   onEnd: () => void;
 }
+
 type Dialogs = {
   text: string;
   highlightedElement: string | null;
@@ -65,17 +66,32 @@ export const Onboarding: React.FC<OnboardingProps> = ({
   const decrementCurrentDialog = () => {
     setCurrentDialog(currentDialog - 1);
   };
+
   useEffect(() => {
     onHighlightChange(dialogs[currentDialog].highlightedElement);
   }, [currentDialog, onHighlightChange]);
 
+  // Эффект для блокировки скроллинга
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"; // Запрещаем прокрутку
+    } else {
+      document.body.style.overflow = "auto"; // Разрешаем прокрутку
+    }
+
+    // Возвращаем прокрутку по умолчанию при размонтировании компонента
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
   if (isOpen) {
     return createPortal(
       <div
-        className={`w-full h-full absolute  left-0 top-0 px-6 z-50 `}
-        style={{transition: "top 0.5s ease-in-out", top: dialogs[currentDialog].coordY }}
+        className={`w-full h-full absolute left-0 top-0 px-6 z-50`}
+        style={{ transition: "top 0.5s ease-in-out", top: dialogs[currentDialog].coordY }}
       >
-        <div className="flex ">
+        <div className="flex">
           <Avatar className="mr-4" />
           <div>
             <p className="rounded-2xl p-2 bg-white text-center">
@@ -107,13 +123,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({
           <LargeButton onClick={onEnd} text="Играть" className="mt-3" />
         )}
       </div>,
-
-      portal,
+      portal
     );
   }
 
-  // return (
-
-  //   //
-  // );
+  return null;
 };

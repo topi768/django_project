@@ -10,7 +10,7 @@ import {
 } from "../../assets/icons/baseAvatar/ranksGerland/index";
 
 interface GerlandProps {
-  rank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  rank: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
   className: string;
 }
 
@@ -18,6 +18,9 @@ const Gerland: React.FC<GerlandProps> = ({ rank = 1, className = "" }) => {
   let IconComponent;
 
   switch (rank) {
+    case 0:
+      IconComponent = IconRanksGerland1;
+      break;
     case 1:
       IconComponent = IconRanksGerland1;
       break;
@@ -40,9 +43,10 @@ const Gerland: React.FC<GerlandProps> = ({ rank = 1, className = "" }) => {
       IconComponent = IconRanksGerland7;
       break;
     default:
-      console.warn(`Invalid rank value: ${rank}`);
-
-      return null;
+      // console.warn(`Invalid rank value: ${rank}`);
+      IconComponent = IconRanksGerland7;
+      // return null;
+      break;
   }
 
   return <IconComponent className={className} />;

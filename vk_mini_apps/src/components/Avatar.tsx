@@ -16,7 +16,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   srcImage = "",
   className,
   typeBaseAvatar = 1,
-  typeRank = 1,
+  typeRank = Number(localStorage.getItem("completedAchievements")),
   link = "",
   onClick,
 }) => {

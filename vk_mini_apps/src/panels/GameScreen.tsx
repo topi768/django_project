@@ -267,7 +267,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
   }
   return (
-    <Panel key={key} id={id} className=" h-full relative  ">
+    <Panel key={key} id={id} className=" h-full relative overflow-hidden ">
       <div className="w-full h-screen  bg-gray-950 flex justify-center items-center ">
         <ImgGame onContainerRefReady={handleContainerRefReady} onFoundCat={onFoundCat} catsCoordinatesProps={catsCoords} src={'http://localhost:8000' + srcImg}  />
       </div>

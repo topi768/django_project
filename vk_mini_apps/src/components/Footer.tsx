@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
           <IconAchievements className="text-black w-8 h-8 md:w-10 md:h-10" />
           <p className="absolute left-1/2 -translate-x-1/2">Достижения</p>
         </div>
-        <Avatar className="md:w-12 md:h-12 cursor-pointer" onClick={() => navigate(`/users/${localStorage.getItem("user_id")}`)}  />
+        <Avatar typeRank={Number(localStorage.getItem("completedAchievements"))} className="md:w-12 md:h-12 cursor-pointer" onClick={() => navigate(`/users/${localStorage.getItem("user_id")}`)}  />
         <div
           className="relative cursor-pointer"
           onClick={() => navigate("/Friends")} // Используем navigate для перехода

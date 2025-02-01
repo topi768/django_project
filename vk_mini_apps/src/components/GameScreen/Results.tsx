@@ -77,7 +77,7 @@ export const Results: React.FC<ResultsProps> = ({
               <Avatar className="absolute -top-[40px] left-1/2 -translate-x-1/2" />
               <p>Уровень 1</p>
               <p className="text-primary">{rang}</p>
-              <ProgressBar current={1} max={5} />
+              <ProgressBar current={results.amountCat} max={10} />
             </div>
 
             <Spacing />

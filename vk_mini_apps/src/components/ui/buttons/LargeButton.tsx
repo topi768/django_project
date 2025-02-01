@@ -51,7 +51,7 @@ export const LargeButton: React.FC<LargeButtonProps> = ({
   };
 
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full flex justify-center max-sm: " >
       <button
         ref={buttonRef} // Присваиваем реф кнопке
         onClick={onClick}
