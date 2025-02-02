@@ -8,7 +8,6 @@ import { Onboarding } from "../components/GameScreen/Onboarding";
 import { PauseModal } from "../components/GameScreen/Pause";
 import { Results } from "../components/GameScreen/Results";
 import { HintCircle } from "../components/GameScreen/HintCircle";
-import { useGetLvls } from "../hooks/useGetLvls";
 import { Win } from "../components/GameScreen/Win";
 import {
   Panel,
@@ -17,6 +16,7 @@ import {
 } from "@vkontakte/vkui";
 import { ImgGame } from "../components/GameScreen/Img";
 import { useNavigate } from "react-router-dom";
+import { useGetLvls } from "@/hooks/game/useGetLvls";
 
 export interface OnboardingProps extends NavIdProps {
   fetchedUser?: UserInfo;
@@ -56,7 +56,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   const navigator = useNavigate();
   const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
-  const { data: levels, error, isLoading: isGetLvlsLoading, isError } = useGetLvls();
+  const { data: levels, isLoading: isGetLvlsLoading } = useGetLvls();
 
   useEffect(() => {
     if (levels) {

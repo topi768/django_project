@@ -1,22 +1,21 @@
 import { useQuery, useMutation, UseMutationResult  } from "@tanstack/react-query";
-import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher } from "../api/appInfo/user";
+import { getUserDataFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher } from "../api/appInfo/user";
 import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
 import { useState } from "react";
 import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
 import {loginUserFetcher} from "@/api/appInfo/user"
 
-export const useUser = () => {
-  const { data: userResponse } = useQuery({
-    queryKey: ["user1"],
-    queryFn: async () => await getUserFetcher(),
-    retry: 3,
-    staleTime: 1000 * 60 * 5,
-  });
+// export const useUser = () => {
+//   const { data: userResponse } = useQuery({
+//     queryKey: ["user1"],
+//     queryFn: async () => await getUserFetcher(),
 
-  return {
-    userResponse,
-  };
-};
+//   });
+
+//   return {
+//     userResponse,
+//   };
+// };
 export const useCreateUser = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -67,7 +66,6 @@ export const useCreateUserToken = () => {
         throw error;
       }
     },
-    retry: 3,
   });
 };
 
@@ -75,8 +73,6 @@ export const useGetUserData = (user_id: number) => {
   return useQuery<UserData, Error>({
     queryKey: ["userData"],
     queryFn: async () => await getUserDataFetcher(user_id),
-    retry: 3,
-    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -101,11 +97,6 @@ export const useUserStats = (userId: number) => {
   return useQuery({
     queryKey: ["userStats", userId],
     queryFn: () => getUserStatsFetcher(userId),
-    retry: 3,
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
   });
 };
 

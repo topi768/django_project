@@ -1,4 +1,3 @@
-import Login from "@/panels/LoginPage";
 import axios from "axios";
 
 export const instanceWithJWT = axios.create({
