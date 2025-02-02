@@ -1,5 +1,6 @@
 import { apiUrls, instance } from "../instance";
 import { instanceWithJWT } from "../instanceWithJWT";
+
 import { UserDataForToken, RegistrationFormData, UserData, UpdateProfileData } from "@/types";
 export const getUserFetcher = async () => {
   const response = await instance.get(apiUrls.appInfo.user);
@@ -26,4 +27,9 @@ export const getUserDataFetcher = async (user_id: number): Promise<UserData>  =>
 export const updateUserFetcher = async (profileData: UpdateProfileData) => {
   const response = await instanceWithJWT.patch('api/update-profile/', profileData);
   return response.data;
+}
+
+export const loginUserFetcher = async ({email, password}: {email: string, password: string}) => {
+     const response = await instance.post('auth/jwt/create/', {email, password} ) 
+     return response.data
 }

@@ -42,7 +42,6 @@ const App = () => {
     
     <QueryClientProvider client={queryClient}>
       <Router>
-        {/* Показываем Header и Footer только для авторизованных пользователей */}
         {/* {isAuth && <Header text="My App" />} */}
 
         <Routes>

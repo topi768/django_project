@@ -3,6 +3,7 @@ import { getUserFetcher,getUserDataFetcher, createUserFetcher, authTokenFetcher,
 import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
 import { useState } from "react";
 import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
+import {loginUserFetcher} from "@/api/appInfo/user"
 
 export const useUser = () => {
   const { data: userResponse } = useQuery({
@@ -40,7 +41,7 @@ export const useCreateUser = () => {
         }
       }
     },
-    retry: 1, // Ограничение на количество повторных попыток
+    retry: 1, 
   });
 
   // Возвращаем мутацию вместе с состоянием ошибки
@@ -107,3 +108,19 @@ export const useUserStats = (userId: number) => {
     refetchOnReconnect: true,
   });
 };
+
+export const useLogin = () => {
+  return useMutation({
+    mutationFn: async ({email, password}: {email :string, password: string}) => {
+      const data = await loginUserFetcher({email, password})
+      return data
+    },
+
+      onSuccess: (data) => {
+      console.log('Profile login successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Failed to update profile:', error);
+    },
+  })
+}

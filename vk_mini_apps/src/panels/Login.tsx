@@ -1,19 +1,19 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
-// import { useLoginUser } from "../hooks/useUser"; // хук для входа
-// import { LoginData } from "@/types";
-import { useAuthStore } from '@/store/authStore'
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "@/components/ui/inputs/InputField";
+import { useLogin } from "@/hooks/useUser";
+import {useAuthStore} from "@/store/authStore"
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { setAuth } = useAuthStore.getState();
+  
+  const {  setAuth } = useAuthStore.getState();
   const [formData, setFormData] = useState({
     email: "topi82806@gmail.com",
     password: "1234567890Q!",
   });
-
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const {mutate: loginUser, data: loginResponse, isSuccess: isSuccessLogin, isError: isErrorLogin, error: loginError, isPending: isPendingLogin   } = useLogin()
+  
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState({
     email: "",
@@ -42,10 +42,7 @@ const Login: React.FC = () => {
       valid = false;
     }
     
-    if (formData.password != JSON.parse(localStorage.getItem('user_data')).password) {
-        newErrors.password = "Неверный пароль.";
-        valid = false;
-    }
+
     // Валидация пароля
     if (!formData.password) {
       newErrors.password = "Пароль обязателен.";
@@ -66,27 +63,23 @@ const Login: React.FC = () => {
       return;
     }
 
-    setIsLoggingIn(true);
 
-    try {
-      //   const tokenData = await loginUser(formData);
-      //   const accessToken = tokenData.access;
-      //   const refreshToken = tokenData.refresh;
+    loginUser(formData)
 
-      // Сохраняем токены
-      //   localStorage.setItem('accessToken', accessToken);
-      //   document.cookie = `refreshToken=${refreshToken}; path=/; secure; httpOnly;`;
-
-      // Обновляем состояние аутентификации
-      setAuth(true);
-
-      // Перенаправляем на профиль
-      navigate(`/users/${localStorage.getItem('user_id')}`);
-    } catch (error) {
-      setIsLoggingIn(false);
-      setErrorMessage('Ошибка при входе. Проверьте данные.');
-    }
   };
+
+  useEffect(() => {
+    if (isSuccessLogin) {
+      setAuth(true);
+      navigate(`/users/${localStorage.getItem('user_id')}`);
+
+    }
+    if (isErrorLogin) {
+      setErrorMessage('ошибка при авторизации')
+      console.log(loginError);
+      
+    }
+  }, [isSuccessLogin, isErrorLogin, navigate])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -117,9 +110,9 @@ const Login: React.FC = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
-            disabled={isLoggingIn}
+            disabled={isPendingLogin}
           >
-            {isLoggingIn ? "Загрузка..." : "Войти"}
+            {isPendingLogin ? "Загрузка..." : "Войти"}
           </button>
 
           {/* Сообщения об ошибке */}

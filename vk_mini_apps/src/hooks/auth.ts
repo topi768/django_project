@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 export const useAuth = () => {
   const [authToken, setAuthToken] = useState(localStorage.getItem("access_token"));
 
@@ -25,3 +24,4 @@ export const useAuth = () => {
     logout,
   };
 };
+
