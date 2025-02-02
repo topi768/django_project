@@ -3,3 +3,4 @@ django_project/management/commands/allCountries.txt
 __pycache__/
 venv/
 django_project/project/new_app/management/commands/_cities.csv
+**/node_modules/
