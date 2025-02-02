@@ -21,11 +21,15 @@ export const EditableText: FC<EditableTextProps> = ({ name, onSave }) => {
             setShowInput(true);
         } else {
             const timeout = setTimeout(() => setShowInput(false), 300);
+            if (currentName === "") {
+                setCurrentName('Не указано');
+            }
             return () => clearTimeout(timeout);
         }
     }, [isEditing]);
 
     const handleInputChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+
         setCurrentName(e.target.value);
     };
 

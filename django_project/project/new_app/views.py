@@ -74,26 +74,33 @@ def upload_image(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PATCH'])
+
+@api_view(["PATCH"])
 def user_profile_update(request):
-    print("HEADERS: ", request.headers)  # Вывод всех заголовков
-    print("AUTHORIZATION: ", request.headers.get('Authorization'))
-    
     user = request.user
+
     if not user.is_authenticated:
         return Response({"detail": "User not authenticated"}, status=401)
 
-    # Получаем информацию о пользователе из модели UserAccountInfo через связь 'info'
+    # Получаем имя пользователя из запроса, если оно передано
+    new_username = request.data.get("name")
+    # Если имя передано, обновляем в таблице `User`
+    if new_username:
+        user.name = new_username
+        user.save()
+
+    # Обновляем информацию в `UserAccountInfo`
     try:
-        user_info = user.info  # Используем 'info', как указано в related_name
+        user_info = user.info  # Используем related_name="info"
     except UserAccountInfo.DoesNotExist:
         return Response({"detail": "User info not found"}, status=404)
 
-    # Создаем сериализатор и передаем данные для обновления
     serializer = UserProfileUpdateSerializer(user_info, data=request.data, partial=True)
+    
     if serializer.is_valid():
-        serializer.save()  # Обновляем информацию пользователя
+        serializer.save()
         return Response(serializer.data, status=200)
+
     return Response(serializer.errors, status=400)
 
 @api_view(['GET'])

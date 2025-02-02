@@ -2,11 +2,7 @@ import React, { ChangeEvent, useState, useEffect } from "react";
 import "react-phone-input-2/lib/style.css";
 import SelectInput from "./SelectInput";
 import TelInput from "./TelInput";
-import { useCountryList } from "@/hooks/useWorldInfo";
 
-type localizationType = {
-  [key: string]: string;
-};
 
 interface InputFieldProps {
   label: string;
@@ -29,7 +25,6 @@ const InputField: React.FC<InputFieldProps> = ({
   options,
   defaultValue = "",
 }) => {
-  const { data: countryList } = useCountryList();
 
 
   const handleSelectChange = (selectedOption: { value: string; label: string } | null) => {
@@ -70,6 +65,7 @@ const InputField: React.FC<InputFieldProps> = ({
         required={required}
         max="2025-12-31"
       />
+      
     </div>
   );
 };

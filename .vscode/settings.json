@@ -1,3 +1,4 @@
 {
-    "codeium.disableSupercomplete": false
+    "codeium.disableSupercomplete": false,
+    "codeium.enableInComments": true
 }

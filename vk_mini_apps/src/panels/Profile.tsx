@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
 import { useNavigate } from "react-router-dom";
-import { EditableText } from "@/components/ui/inputs/EditableText"; // Импорт нового компонента
+import { EditableText } from "@/components/ui/inputs/EditableText"; 
 import { useUpdateUserProfile } from "../hooks/useUser.ts";
 import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
@@ -22,6 +22,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
 
     const userData = localStorage.getItem("user_data");
     const parsedUserData = userData ? JSON.parse(userData) : null;
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     type FormData = {
         name: string;
@@ -55,11 +56,18 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         if (!hasHadBirthdayThisYear) {
             age--;
         }
-
+        
         return age;
     };
 
     const handleSaveProfile = () => {
+        if (!formData.name){
+            
+            
+            setErrorMessage("Имя не может быть пустым");
+            return
+        }
+        setErrorMessage("");
         mutationUpdateProfile.mutate({
             name: formData.name,
             country: formData.country_code,
@@ -148,6 +156,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                     {mutationUpdateProfile.status === "success" && (
                         <p className="text-green-500">Данные успешно обновлены!</p>
                     )}
+                    {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                 </div>
             </div>
 

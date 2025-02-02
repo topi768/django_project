@@ -62,15 +62,15 @@ const Login: React.FC = () => {
     if (!validateForm()) {
       return;
     }
-
-
+    
+    // localStorage.setItem('accessToken', JSON.stringify(formData));
     loginUser(formData)
-
   };
 
   useEffect(() => {
     if (isSuccessLogin) {
       setAuth(true);
+      localStorage.setItem('accessToken', loginResponse.access);
       navigate(`/users/${localStorage.getItem('user_id')}`);
 
     }
