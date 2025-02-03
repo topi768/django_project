@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
-
+from celery.schedules import crontab
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(BASE_DIR)
@@ -44,13 +44,14 @@ INSTALLED_APPS = [
     'django_extensions',
     
     'djoser',
-    'new_app',
+    
     'project',
     
     # 'social_django',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
-
+    'rest_framework_simplejwt.token_blacklist',
+    #  'new_app.apps.MyAppConfig',
+'new_app',
 ]
 
 MIDDLEWARE = [
@@ -210,6 +211,18 @@ DJOSER = {
 # }
 
 
+# Celery settings
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+
+# # Celery Beat настройка
+# CELERY_BEAT_SCHEDULE = {
+#     'delete-inactive-users': {
+#         'task': 'app.tasks.delete_inactive_users',
+#         'schedule': crontab(minute=0, hour=0),  # Запуск задачи ежедневно в полночь
+#     },
+# }
 
 
 EMAIL_BACKEND: 'django.core.mail.backends.smtp.EmailBackend'
