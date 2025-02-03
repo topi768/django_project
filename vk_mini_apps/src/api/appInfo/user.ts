@@ -18,7 +18,7 @@ export const authTokenFetcher = async (userData: UserDataForToken) => {
   return response.data
   }
 
-export const getUserDataFetcher = async (user_id: number): Promise<UserData>  => {
+export const getUserDataByIdFetcher = async (user_id: number): Promise<UserData>  => {
   const response = await instance.get('api/user-account-info/' + user_id);
   
   return response.data;
@@ -32,4 +32,9 @@ export const updateUserFetcher = async (profileData: UpdateProfileData) => {
 export const loginUserFetcher = async ({email, password}: {email: string, password: string}) => {
      const response = await instance.post('auth/jwt/create/', {email, password} ) 
      return response.data
+}
+
+export const getMyUserId = async () => {
+  const response = await instanceWithJWT.get('auth/users/me/');
+  return response.data.id;
 }

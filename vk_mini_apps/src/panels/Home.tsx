@@ -1,7 +1,6 @@
 import { FC, useEffect , useState} from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
 import { UserInfo } from "@vkontakte/vk-bridge";
-import { useRouteNavigator } from "@vkontakte/vk-mini-apps-router";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
 import { Header } from "../components/Header";
 import { Spacing } from "../components/ui/Spacing";
@@ -10,47 +9,18 @@ import { Footer } from "../components/Footer";
 import { TimerReverse } from "../components/TimerReverse";
 import { ListItem } from "../components/ui/ListItem";
 import { useNavigate } from "react-router-dom";
-import { useGetUserData } from "@/hooks/useUser"; 
-import { useCountryList, useCitiesList } from "../hooks/useWorldInfo.ts";
+import { useGetMyUserId, useGetUserData } from "@/hooks/useUser"; 
 import { useUserStats } from "../hooks/useUser.ts";
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
 
 export const Home: FC<HomeProps> = ({ id }) => {
-  
-  const { data: userData, isLoading, isError, error } = useGetUserData(Number(localStorage.getItem("user_id") ));
-  const { data: countryList } = useCountryList();
-  const [country, setCountry] = useState<string>("");
- 
-  
-  function getAgeFromBirthDate(birthDateString: string): number {
-    // Преобразуем строку в объект даты
-    const birthDate = new Date(birthDateString);
-  
-    if (isNaN(birthDate.getTime())) {
-      throw new Error("Неверный формат даты. Ожидается строка вида 'ГГГГ-ММ-ДД'.");
-    }
-  
-    // Текущая дата
-    const today = new Date();
-  
-    // Вычисляем возраст
-    let age = today.getFullYear() - birthDate.getFullYear();
-  
-    // Проверяем, был ли день рождения в этом году
-    const hasHadBirthdayThisYear =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-  
-    // Если день рождения ещё не был в этом году, уменьшаем возраст на 1
-    if (!hasHadBirthdayThisYear) {
-      age--;
-    }
-  
-    return age;
-  
-  }
+  const {data: userId} = useGetMyUserId()
+
+  const { data: userData, isLoading, isError, error, refetch: refetchUserData } = useGetUserData(userId);
+  const { data: userStat, refetch} = useUserStats(userId);
+
   interface RankingDataItem {
     iconName: string;
     route: string;
@@ -60,8 +30,12 @@ export const Home: FC<HomeProps> = ({ id }) => {
 
   const navigate = useNavigate();
 
-  const { data: userStat , refetch} = useUserStats(Number(localStorage.getItem("user_id")));
-
+  useEffect(() => {
+    if (userData) {
+      refetchUserData();
+      
+    }
+  }, [userData]);
 
   const value = {
     score: 0,
@@ -110,45 +84,9 @@ const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
     // Обновление данных при монтировании компонента или возврате на страницу
     refetch();
   }, [refetch]);
-  useEffect(() => {
-    if (countryList) {
-      const country = countryList.find((country) => country.country_code === userData?.country)?.country_name;
-      if (country) {
-        setCountry(country);
-        
-      }
-    }
-  }, [countryList, userData]);
 
 
-  // const rankingData = [
 
-
-  //   {
-  //     iconName: "score",
-  //     route: "",
-  //     text: "Счет",
-  //     value: 0,
-  //   },
-  //   {
-  //     iconName: "top",
-  //     route: "",
-  //     text: "Место в рейтинге",
-  //     value: value?.userPosition,
-  //   },
-  //   {
-  //     iconName: "score",
-  //     route: "",
-  //     text: "Найдено котиков",
-  //     value: 0,
-  //   },
-  //   {
-  //     iconName: "achievements",
-  //     route: "",
-  //     text: "Открыто достижений",
-  //     value: value?.achievementsCount,
-  //   },
-  // ];
 
   return (
     <>

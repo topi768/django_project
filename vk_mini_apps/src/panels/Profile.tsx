@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
 import { useNavigate } from "react-router-dom";
 import { EditableText } from "@/components/ui/inputs/EditableText"; 
-import { useUpdateUserProfile } from "../hooks/useUser.ts";
+import { useGetUserData, useUpdateUserProfile } from "../hooks/useUser.ts";
 import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
 import { Header } from "../components/Header";
@@ -16,12 +16,13 @@ export interface ProfileProps extends NavIdProps {}
 
 export const Profile: FC<ProfileProps> = ({ id }) => {
     const mutationUpdateProfile = useUpdateUserProfile();
-
+    const { data: userData, isLoading, isError, error,refetch: refetchUserData } = useGetUserData(Number(localStorage.getItem("user_id") ));
+    
     const { data: countryList } = useCountryList();
     const navigate = useNavigate();
 
-    const userData = localStorage.getItem("user_data");
-    const parsedUserData = userData ? JSON.parse(userData) : null;
+    const userDataStorage = localStorage.getItem("user_data");
+    const parsedUserData = userDataStorage ? JSON.parse(userDataStorage) : null;
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     type FormData = {
@@ -74,6 +75,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
             city: formData.city,
             date_of_birth: formData.date_of_birth,
         });
+        refetchUserData();
         localStorage.setItem("user_data", JSON.stringify(formData));
     };
 

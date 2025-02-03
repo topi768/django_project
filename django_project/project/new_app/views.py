@@ -38,7 +38,6 @@ def get_countries(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_cities(request, country_code):
-    print(country_code)
     try:
         cities = CityAndCountryCode.objects.filter(country_code=country_code)
         serializer = CityAndCountryCodeSerializer(cities, many=True)
@@ -50,6 +49,7 @@ def get_cities(request, country_code):
 def get_user_account_info(request, user_id):
     try:
         user_account_info = UserAccountInfo.objects.get(user_id=user_id)
+
     except:
         return Response({"detail": "User account info not found."}, status=status.HTTP_404_NOT_FOUND)
     serializer = UserAccountInfoSerializer(user_account_info)
@@ -188,7 +188,6 @@ def get_user_achievements(request, user_id):
     try:
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
-
         # Получаем все достижения, связанные с этим пользователем
         achievements = user_info.achievements.all()
 
@@ -218,5 +217,13 @@ def get_user_stats(request, user_id):
             "kisKis": user_info.kisKis
         }, status=status.HTTP_200_OK)
     
+    except UserAccountInfo.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def getUser_idByEmail(request, email):
+    try:
+        user = UserAccountInfo.objects.get(email=email)
+        return Response({"user_id": user.user_id}, status=status.HTTP_200_OK)
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

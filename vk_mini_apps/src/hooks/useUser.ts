@@ -1,5 +1,5 @@
 import { useQuery, useMutation, UseMutationResult  } from "@tanstack/react-query";
-import { getUserDataFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher } from "../api/appInfo/user";
+import { getUserDataByIdFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher, getMyUserId } from "../api/appInfo/user";
 import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
 import { useState } from "react";
 import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
@@ -71,8 +71,10 @@ export const useCreateUserToken = () => {
 
 export const useGetUserData = (user_id: number) => {
   return useQuery<UserData, Error>({
-    queryKey: ["userData"],
-    queryFn: async () => await getUserDataFetcher(user_id),
+    queryKey: ["userData", user_id],
+    queryFn: () => getUserDataByIdFetcher(user_id),
+    enabled: !!user_id, // Не запрашивать, если user_id = 0 или undefined
+
   });
 };
 
@@ -93,10 +95,12 @@ export const useUpdateUserProfile = (): UseMutationResult<
 };
 
 
-export const useUserStats = (userId: number) => {
+export const useUserStats = (userId: number | undefined) => {
   return useQuery({
     queryKey: ["userStats", userId],
     queryFn: () => getUserStatsFetcher(userId),
+    enabled: !!userId, // Не запрашивать, если user_id = 0 или undefined
+
   });
 };
 
@@ -115,3 +119,10 @@ export const useLogin = () => {
     },
   })
 }
+
+export const useGetMyUserId = () => {
+  return useQuery({
+    queryKey: ["user_id"],
+    queryFn: () => getMyUserId(),
+  });
+};
