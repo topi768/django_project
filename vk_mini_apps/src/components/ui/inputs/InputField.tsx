@@ -12,7 +12,7 @@ interface InputFieldProps {
   onChange: (e: { target: { name: string; value: string } }) => void;
   required?: boolean;
   options?: { value: string; label: string }[];
-  defaultValue?: string;
+  defaultValue?: { value: string | undefined; label: string | undefined };
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -23,7 +23,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   required = false,
   options,
-  defaultValue = "",
+  defaultValue = { value: "", label: "" },
 }) => {
 
 

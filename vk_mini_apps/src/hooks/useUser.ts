@@ -40,7 +40,6 @@ export const useCreateUser = () => {
         }
       }
     },
-    retry: 1, 
   });
 
   // Возвращаем мутацию вместе с состоянием ошибки
@@ -98,9 +97,11 @@ export const useUpdateUserProfile = (): UseMutationResult<
 export const useUserStats = (userId: number | undefined) => {
   return useQuery({
     queryKey: ["userStats", userId],
-    queryFn: () => getUserStatsFetcher(userId),
-    enabled: !!userId, // Не запрашивать, если user_id = 0 или undefined
-
+    queryFn: () => {
+      if (userId === undefined) return Promise.reject("User ID is undefined");
+      return getUserStatsFetcher(userId);
+    },
+    enabled: !!userId, // Не запрашивать, если userId = undefined
   });
 };
 

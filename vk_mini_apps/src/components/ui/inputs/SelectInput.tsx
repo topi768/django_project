@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import Select from "react-select";
 
 interface SelectInputProps {
@@ -6,7 +6,7 @@ interface SelectInputProps {
   value: string;
   options?: { value: string; label: string }[];
   defaultValue?: { value: string | undefined; label: string | undefined };
-  onChange: (selectedOption: { value: string; label: string } | null) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const getTransformedLabel = (label?: string): string => {
