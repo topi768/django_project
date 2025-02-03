@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from .models import UserAccountInfo, Achievement, ImageWithCoordinates, CountryCodeAndCountryName, CityAndCountryCode
 from .serializers import UserAccountInfoSerializer,ImageWithCoordinatesSerializer,  UserProfileUpdateSerializer, CountryCodeAndCountryNameSerializer, CityAndCountryCodeSerializer
 from rest_framework.decorators import api_view
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import permission_classes
 from .models import ImageWithCoordinates
 from .serializers import ImageWithCoordinatesSerializer
@@ -105,7 +105,6 @@ def user_profile_update(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-
 def get_levels(request):
     serializer = ImageWithCoordinatesSerializer(ImageWithCoordinates.objects.all(), many=True)
     return Response(serializer.data)
@@ -227,3 +226,11 @@ def getUser_idByEmail(request, email):
         return Response({"user_id": user.user_id}, status=status.HTTP_200_OK)
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def delete_account_soft(request):
+    user = request.user
+    user.soft_delete() 
+    return Response({"detail": "Account marked for deletion. You can restore it within 30 days."}, status=200)

@@ -25,5 +25,6 @@ urlpatterns = [
 
     path("get-user-stats/<int:user_id>/", views.get_user_stats, name="get_user_stats"),
     path("api/get-user-id-by-email/<str:email>/", views.getUser_idByEmail, name="get_user_id_by_email"),
+    path("api/delete-user-soft/", views.delete_account_soft, name="delete_user_soft"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

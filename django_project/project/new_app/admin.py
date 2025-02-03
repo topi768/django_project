@@ -8,7 +8,7 @@ from .models import ImageWithCoordinates, Achievement, UserAccount, UserAccountI
 class UserAccountForm(forms.ModelForm):
     class Meta:
         model = UserAccount
-        fields = ['email', 'name', 'is_staff', 'is_active', 'is_superuser']
+        fields = ['email', 'name', 'is_staff', 'is_active', 'is_superuser', 'deleted_at']
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'vTextField'}),
             'name': forms.TextInput(attrs={'class': 'vTextField'}),
@@ -17,7 +17,7 @@ class UserAccountForm(forms.ModelForm):
 @admin.register(UserAccount)
 class UserAccountAdmin(admin.ModelAdmin):
     form = UserAccountForm
-    list_display = ('email', 'name', 'is_staff', 'is_active', 'is_superuser', 'last_login')
+    list_display = ('email', 'name', 'is_staff', 'is_active', 'is_superuser', 'deleted_at')
     search_fields = ('email', 'name')
     list_filter = ('is_staff', 'is_active', 'is_superuser')
 

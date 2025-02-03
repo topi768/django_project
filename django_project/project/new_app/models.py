@@ -3,7 +3,8 @@ from enum import unique
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager
-
+from django.utils import timezone
+from datetime import timedelta
 # from project.new_app.views import user_list
 
 
@@ -45,14 +46,27 @@ class UserAccountManager(BaseUserManager):
 class UserAccount(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
-    is_staff = models.BooleanField(default=False)  # Добавлено поле is_staff
-    is_active = models.BooleanField(default=True)  # Добавлено поле is_active
-    is_superuser = models.BooleanField(default=False)  # Добавлено поле is_superuser
+    is_staff = models.BooleanField(default=False)  
+    is_active = models.BooleanField(default=True)  
+    is_superuser = models.BooleanField(default=False) 
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     objects = UserAccountManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
+
+    def soft_delete(self):
+        """Мягкое удаление — аккаунт становится неактивным"""
+        self.deleted_at = timezone.now()
+        self.is_active = False
+        self.save()
+
+    def restore(self):
+        """Восстановление аккаунта"""
+        self.deleted_at = None
+        self.is_active = True
+        self.save()
 
     def __str__(self):
         return self.email
