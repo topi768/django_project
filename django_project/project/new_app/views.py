@@ -111,27 +111,28 @@ def get_levels(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
-def add_find_cats(request, user_id):
+def add_find_cats(request):
     try:
-        # Извлекаем количество, на которое нужно увеличить количество найденных котов
+        user = request.user
+        user_id = user.id
         increment_value = request.data.get('increment', 1)  # Если не передано, увеличиваем на 1 по умолчанию
 
-        # Получаем пользователя
         user_info = UserAccountInfo.objects.get(user_id=user_id)
-        
-        # Добавляем переданное количество найденных котов
+        print(user_info.countFindCats, increment_value)
         user_info.countFindCats += increment_value
         user_info.save()
-
-        # Добавляем достижения, если условия выполнены
-        user_info.add_achievement()
-
+        
         return Response({
             "message": "FindCats updated successfully",
-            "countFindCats": user_info.countFindCats,
-            "achievements": [achievement.name for achievement in user_info.achievements.all()]  # Возвращаем список достижений
-        }, status=status.HTTP_200_OK)
+        })
+        # Добавляем достижения, если условия выполнены
+        # user_info.add_achievement()
+
+        # return Response({
+        #     "message": "FindCats updated successfully",
+        #     "countFindCats": user_info.countFindCats,
+        #     "achievements": [achievement.name for achievement in user_info.achievements.all()]  # Возвращаем список достижений
+        # }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -148,9 +149,11 @@ RANKS = [
 ]
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
-def add_points(request, user_id):
+def add_points(request):
     try:
+        user = request.user
+        user_id = user.id
+        print(user_id)
         # Извлекаем количество, на которое нужно увеличить количество найденных котов
         increment_value = request.data.get('increment', 1)  # Если не передано, увеличиваем на 1 по умолчанию
 

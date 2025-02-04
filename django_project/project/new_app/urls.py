@@ -17,8 +17,8 @@ urlpatterns = [
     path('api/update-profile/', views.user_profile_update, name='update-profile'),
     path('api/get-levels/', views.get_levels, name='get-levels'),
 
-    path('add-findcats/<int:user_id>/', views.add_find_cats, name='add_findcats'),
-    path('add-points/<int:user_id>/', views.add_points, name='add_points'),
+    path('add-findcats/', views.add_find_cats, name='add_findcats'),
+    path('add-points/', views.add_points, name='add_points'),
 
     path('achievements/', views.get_all_achievements, name='get_all_achievements'),
     path('user/<int:user_id>/achievements/', views.get_user_achievements, name='get_user_achievements'),
