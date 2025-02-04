@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from django.contrib.auth import get_user_model
-from .models import UserAccount,Achievement, ImageWithCoordinates,  UserAccountInfo, CountryCodeAndCountryName, CityAndCountryCode
+from .models import UserAccount,Achievement, ImageWithCoordinates,  UserAccountInfo
 from rest_framework.views import APIView
 
 
@@ -66,15 +66,7 @@ class UserAccountInfoSerializer(serializers.ModelSerializer):
             'phone', 'date_of_birth', 'achievements'
         )
 
-class CountryCodeAndCountryNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CountryCodeAndCountryName
-        fields = ('country_code', 'country_name')
 
-class CityAndCountryCodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CityAndCountryCode
-        fields = ('country_code', 'city')
 
 class ImageWithCoordinatesSerializer(serializers.ModelSerializer):
 

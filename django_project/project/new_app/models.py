@@ -1,29 +1,24 @@
-from enum import unique
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import  PermissionsMixin, BaseUserManager
 from django.utils import timezone
-from datetime import timedelta
-# from project.new_app.views import user_list
 
 
-# Create your models here.
-class Room(models.Model):
-    code = models.CharField(max_length=8, default="", unique=True)
-    host = models.CharField(max_length=50, unique=True)
-    guest_can_pause = models.BooleanField(null=False, default=False)
-    votes_to_skip = models.IntegerField(null=False, default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Room(models.Model):
+#     code = models.CharField(max_length=8, default="", unique=True)
+#     host = models.CharField(max_length=50, unique=True)
+#     guest_can_pause = models.BooleanField(null=False, default=False)
+#     votes_to_skip = models.IntegerField(null=False, default=1)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.conf import settings
 
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, name, password=None, **extra_fields):
@@ -111,25 +106,7 @@ class UserAccountInfo(models.Model):
         return f"Account info for {self.user.email}"
 
 
-class CountryCodeAndCountryName(models.Model):
-    country_code = models.CharField(max_length=255, blank=True, null=False)
-    country_name = models.CharField(max_length=255, blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.country_name} ({self.country_code})"
-
-class CityAndCountryCode(models.Model):
-    country_code = models.CharField(max_length=255, blank=True, null=False)
-    city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey(
-        "CountryCodeAndCountryName",  # Связываем с другой моделью
-        on_delete=models.CASCADE,
-        related_name="cities",  # Название обратной связи
-        blank=True,
-        null=True
-    )
-    def __str__(self):
-        return f"{self.country_code} ({self.city})"
 
 
 class ImageWithCoordinates(models.Model):

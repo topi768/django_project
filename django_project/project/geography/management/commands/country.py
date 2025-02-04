@@ -1,6 +1,6 @@
 # import re
 from django.core.management.base import BaseCommand
-from new_app.models import CountryCodeAndCountryName
+from geography.models import CountryCodeAndCountryName
 
 
 def convert_country_code_to_number(country_code):

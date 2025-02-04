@@ -1,7 +1,7 @@
 
 import re
 from django.core.management.base import BaseCommand
-from new_app.models import CityAndCountryCode, CountryCodeAndCountryName
+from geography.models import CityAndCountryCode, CountryCodeAndCountryName
 from transliterate import translit
 
 import re
