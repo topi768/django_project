@@ -63,7 +63,7 @@ class UserAccountInfoSerializer(serializers.ModelSerializer):
         model = UserAccountInfo
         fields = (
             'email', 'name', 'country', 'city', 'interests',
-            'phone', 'date_of_birth', 'achievements'
+            'phone', 'date_of_birth', 'achievements', 'points', 'rank'
         )
 
 
@@ -96,3 +96,9 @@ class UserProfileUpdateSerializer(serializers.Serializer):
         user_info.phone = validated_data.get('phone', user_info.phone)
         user_info.save()
         return user_info
+
+
+class LeaderboardUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAccountInfo
+        fields = ['name', 'points', 'rank', 'id']

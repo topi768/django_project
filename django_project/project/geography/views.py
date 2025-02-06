@@ -12,7 +12,6 @@ from rest_framework.decorators import permission_classes
 def get_countries(request):
     countries = CountryCodeAndCountryName.objects.all()
     serializer = CountryCodeAndCountryNameSerializer(countries, many=True)
-    print(serializer.data)
     return Response(serializer.data)
 @api_view(['GET'])
 @permission_classes([AllowAny])

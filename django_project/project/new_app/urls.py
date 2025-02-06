@@ -19,10 +19,13 @@ urlpatterns = [
     path('add-points/', views.add_points, name='add_points'),
 
     path('achievements/', views.get_all_achievements, name='get_all_achievements'),
-    path('user/<int:user_id>/achievements/', views.get_user_achievements, name='get_user_achievements'),
+    path('api/my-achievements/', views.get_my_achievements, name='get_my_achievements'),
 
-    path("get-user-stats/<int:user_id>/", views.get_user_stats, name="get_user_stats"),
+    path("get-user-stats/", views.get_user_stats, name="get_user_stats"),
     path("api/get-user-id-by-email/<str:email>/", views.getUser_idByEmail, name="get_user_id_by_email"),
     path("api/delete-user-soft/", views.delete_account_soft, name="delete_user_soft"),
+
+    path('api/get_leaderboard/', views.get_leaderboard, name='get_leaderboard'),
+    path('api/get-my-place-in-ranking', views.get_my_palce_in_ranking, name="get_my_palce_in_ranking" )
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserAccountInfo, Achievement, ImageWithCoordinates
-from .serializers import UserAccountInfoSerializer,ImageWithCoordinatesSerializer,  UserProfileUpdateSerializer
+from .serializers import LeaderboardUserSerializer, UserAccountInfoSerializer,ImageWithCoordinatesSerializer,  UserProfileUpdateSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import permission_classes
@@ -96,30 +96,31 @@ def get_levels(request):
     return Response(serializer.data)
 
 
+
+
 @api_view(['POST'])
 def add_find_cats(request):
     try:
         user = request.user
         user_id = user.id
-        increment_value = request.data.get('increment', 1)  # Если не передано, увеличиваем на 1 по умолчанию
+        increment_value = int(request.data.get('increment', 1))  # Если не передано, увеличиваем на 1 по умолчанию
 
         user_info = UserAccountInfo.objects.get(user_id=user_id)
-        print(user_info.countFindCats, increment_value)
         user_info.countFindCats += increment_value
         user_info.save()
-        
-        return Response({
-            "message": "FindCats updated successfully",
-        })
-        # Добавляем достижения, если условия выполнены
-        # user_info.add_achievement()
+        # 
+        # Проверяем, может ли пользователь получить новые достижения
+        achievements = list(Achievement.objects.all())
+        for ach in achievements:
+            if user_info.countFindCats >= ach.maxProgress:
+                user_info.achievements.add(ach)
+                user_info.save()
+            else:
+                print(f"{user_info.countFindCats} не достигает {ach.maxProgress}")
 
-        # return Response({
-        #     "message": "FindCats updated successfully",
-        #     "countFindCats": user_info.countFindCats,
-        #     "achievements": [achievement.name for achievement in user_info.achievements.all()]  # Возвращаем список достижений
-        # }, status=status.HTTP_200_OK)
-    
+        return Response({
+            "message": "FindCats updated successfully", 
+        })
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -139,20 +140,19 @@ def add_points(request):
     try:
         user = request.user
         user_id = user.id
-        print(user_id)
         # Извлекаем количество, на которое нужно увеличить количество найденных котов
-        increment_value = request.data.get('increment', 1)  # Если не передано, увеличиваем на 1 по умолчанию
+        increment_value = int( request.data.get('increment', 1))  # Если не передано, увеличиваем на 1 по умолчанию
 
         # Получаем пользователя
         user_info = UserAccountInfo.objects.get(user_id=user_id)
         
         # Добавляем переданное количество найденных котов
         user_info.points += increment_value
+
         user_info.save()
 
         return Response({
             "message": "FindCats updated successfully",
-            "countFindCats": user_info.countFindCats
         }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
@@ -164,23 +164,36 @@ def add_points(request):
 def get_all_achievements(request):
     achievements = Achievement.objects.all()
     achievement_data = [
-        {"id": achievement.id, "name": achievement.name, "description": achievement.description, "currentProgress": achievement.currentProgress, "maxProgress": achievement.maxProgress}
+        {"id": achievement.id, 
+         "name": achievement.name, 
+         "description": achievement.description,
+        "maxProgress": achievement.maxProgress}
         for achievement in achievements
     ]
     return Response(achievement_data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])  # Этот путь доступен только для авторизованных пользователей
-def get_user_achievements(request, user_id):
+@permission_classes([IsAuthenticated]) 
+def get_my_achievements(request):
     try:
+        user_id = request.user.id
+        print(user_id)
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
+        count_find_cats = user_info.countFindCats
         # Получаем все достижения, связанные с этим пользователем
         achievements = user_info.achievements.all()
 
         achievement_data = [
-            {"id": achievement.id, "name": achievement.name, "description": achievement.description}
+            {
+            "id": achievement.id,
+             "name": achievement.name,
+             "description": achievement.description,
+             "maxProgress": achievement.maxProgress,
+             "currentProgress": count_find_cats
+             
+             }
             for achievement in achievements
         ]
         
@@ -191,9 +204,12 @@ def get_user_achievements(request, user_id):
     
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-def get_user_stats(request, user_id):
+@permission_classes([IsAuthenticated]) 
+def get_user_stats(request):
     try:
+        print("111")
+        user_id =  request.user.id
+        
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
         
@@ -223,3 +239,23 @@ def delete_account_soft(request):
     user = request.user
     user.soft_delete() 
     return Response({"detail": "Account marked for deletion. You can restore it within 30 days."}, status=200)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_leaderboard(request):
+    users = UserAccountInfo.objects.all().order_by('-points')
+    serializer = LeaderboardUserSerializer(users, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_my_palce_in_ranking(request):
+    user_id = request.user.id
+
+    users = UserAccountInfo.objects.order_by('-points').values_list('user_id', flat=True)
+    try:
+        # Определяем индекс текущего пользователя (начинается с 0, поэтому +1)
+        rank = list(users).index(user_id) + 1
+        return Response(rank, status=status.HTTP_200_OK)
+    except ValueError:
+        return Response({"error": "User not found in ranking"}, status=status.HTTP_404_NOT_FOUND)
