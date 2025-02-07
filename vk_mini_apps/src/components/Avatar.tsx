@@ -3,6 +3,8 @@ import IconBaseAvatar2 from "@/assets/icons/baseAvatar/avatar/2.svg";
 import IconBaseAvatar3 from "@/assets/icons/baseAvatar/avatar/3.svg";
 import { useNavigate } from "react-router-dom";
 import Gerland from "./ui/Gerland";
+import { useUserStats } from "@/hooks/useUser";
+import { useEffect, useState } from "react";
 interface AvatarProps {
   srcImage?: string;
   className?: string;
@@ -16,11 +18,20 @@ export const Avatar: React.FC<AvatarProps> = ({
   srcImage = "",
   className,
   typeBaseAvatar = 1,
-  typeRank = Number(localStorage.getItem("completedAchievements")),
   link = "",
   onClick,
 }) => {
   const navigate = useNavigate();
+  const {data: userStats} = useUserStats()
+  const [rankNumber, setRankNumber] = useState(0)
+  useEffect (() => {
+    if (userStats) {
+      console.log(userStats.rank)
+      
+      setRankNumber(userStats.rank)
+      
+    }
+  }, [userStats])
   let BaseAvatar;
 
   switch (typeBaseAvatar) {
@@ -54,7 +65,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
           <Gerland
             className="absolute bottom-[-7px] -translate-x-[1px]"
-            rank={typeRank}
+            rank={rankNumber}
           />
         </div>
       </div>

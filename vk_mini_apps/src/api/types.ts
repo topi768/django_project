@@ -68,3 +68,20 @@ export type LevelData = {
   level: number; // Уровень 
 };
 export type LevelsData = LevelData[];
+
+export type LeaderboardUser = {
+  id: number;
+  name: string;
+  points: number;
+  rank: number;
+}
+export type LeaderboardList = LeaderboardUser[];
+
+export interface UserStats {
+  countFindCats: number;
+  kisKis: number;
+  points: number;
+  rank: number;
+  rank_name: string;
+  
+}

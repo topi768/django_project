@@ -27,6 +27,10 @@ export const EditableText: FC<EditableTextProps> = ({ name, onSave }) => {
             return () => clearTimeout(timeout);
         }
     }, [isEditing]);
+    useEffect(() => {
+        setCurrentName(name);
+        
+    }, [name]);
 
     const handleInputChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
 

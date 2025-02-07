@@ -6,18 +6,18 @@ import { ProgressBar } from "../components/ui/ProgressBar";
 import { FC, useEffect, useState } from "react";
 import IconCheck from "@/assets/icons/check.svg";
 import { Footer } from "../components/Footer";
-import { useAchievements } from "@/hooks/game/useGameUserInfo";
+import { useAchievements, useUserAchievements } from "@/hooks/game/useGameUserInfo";
 import { useUserStats } from "@/hooks/useUser";
+import { Achievement } from "@/api/game/gameUserInfo";
 
 export interface AchievementsProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
 
 export const Achievements: FC<AchievementsProps> = ({ id }) => {
-  const { data: userStat, refetch: refetchUserStats } = useUserStats(Number(localStorage.getItem("user_id")));
-  const { data: achievements } = useAchievements();
 
-  interface AchievementsList {
+  interface UIAchievement {
+    id: number;
     name: string;
     subtext: string;
     buttonText: string;
@@ -25,73 +25,74 @@ export const Achievements: FC<AchievementsProps> = ({ id }) => {
     isCompleted: boolean;
     current: number;
     max: number;
-    id: number;
+    
   }
+  const {data: achievementsList} = useAchievements()
+  const {data: myAchievementList} = useUserAchievements()
+  const [currentFindCats, setCurrentFindCats] = useState(0);
 
-  const [achievementsList, setAchievementsList] = useState<AchievementsList[]>([]);
-  const [completedCount, setCompletedCount] = useState<number>(0);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetchUserStats(); 
-    }, 2000);
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refetchUserStats();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [refetchUserStats]);
+  const [UIachievements, setUIAchievements] = useState<UIAchievement[]>([]);
+  
+  const {data: userStats} = useUserStats()
 
   useEffect(() => {
-    if (achievements && userStat) {
-      const updatedAchievementsList = achievements.map((item) => ({
-        name: item.name,
-        subtext: item.description,
-        buttonText: "Повысить ранг",
-        isCompleted: userStat?.countFindCats >= Number(item.maxProgress),
-        isDisabled: false,
-        current: userStat?.countFindCats,
-        max: Number(item.maxProgress),
-        id: item.id,
-      }));
-
-      setAchievementsList(updatedAchievementsList);
-
-      const count = updatedAchievementsList.filter((item) => item.isCompleted).length;
-      setCompletedCount(count);
-
-      localStorage.setItem("completedAchievements", String(count)); // Сохраняем в localStorage
+    if (userStats) {
+      setCurrentFindCats(userStats.countFindCats);
+      
     }
-  }, [achievements, userStat]);
+  }, [userStats]);
+  useEffect(() => {
+    if (achievementsList && myAchievementList) {
+      // Преобразуем достижения, которые уже есть у пользователя
+      const transformedMyAchievements: UIAchievement[] = myAchievementList.map((ach) => ({
+        id: ach.id,
+        name: ach.name,
+        subtext: ach.description,
+        buttonText: "1",
+        isDisabled: false,
+        isCompleted: false,
+        current:  ach.maxProgress, // или другое значение
+        max: ach.maxProgress,
+      }));
+  
+      // Выбираем достижения, которых нет у пользователя (уникальные)
+      const uniqueAchievements = achievementsList.filter(
+        (achievement) => !myAchievementList.some((myAch) => myAch.id === achievement.id)
+      );
+  
+      const transformedUniqueAchievements: UIAchievement[] = uniqueAchievements.map((ach) => ({
+        id: ach.id,
+        name: ach.name,
+        subtext: ach.description,
+        buttonText: "1",
+        isDisabled: false,
+        isCompleted: false,
+        current: currentFindCats,
+        max: ach.maxProgress,
+      }));
+  
+      // Объединяем оба массива
+      const finalAchievements = [...transformedMyAchievements, ...transformedUniqueAchievements];
+  
+      // Устанавливаем итоговый массив достижений
+      setUIAchievements(finalAchievements);
+    }
+  }, [achievementsList, myAchievementList, currentFindCats]);
+  
+
 
   const handleRankIncrease = (itemId: number) => {
-    setAchievementsList(prevList =>
-      prevList.map((item) =>
-        item.id === itemId
-          ? { ...item, isCompleted: false, buttonText: "Ранг повышен", isDisabled: true }
-          : item
-      )
-    );
 
-    const updatedCount = completedCount + 1;
-    setCompletedCount(updatedCount);
-    localStorage.setItem("completedAchievements", String(updatedCount));
   };
 
   return (
     <Panel id={id} className="w-full">
       <div className="px-6">
         <Header text="Достижения" />
+        
+          
         <Spacing />
-        {achievementsList.map((item) => (
+        {UIachievements?.map((item) => (
           <div key={item.id} className="w-full h-full py-7">
             <div className="flex justify-between">
               <p className="text-[17px]">{item.name}</p>

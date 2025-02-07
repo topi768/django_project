@@ -56,7 +56,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   const navigator = useNavigate();
   const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
-  const { data: levels, isLoading: isGetLvlsLoading } = useGetLvls();
+  const { data: levels, isLoading : isGetLvlsLoading } = useGetLvls();
 
   useEffect(() => {
     if (levels) {
@@ -224,7 +224,6 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
 
 
   const onFoundCat = (countFoundedCats: number, isFoundAllCat: boolean, catsCoordinatesProps: Cat[]) => {
-    console.log("onFoundCat");
     
     setCatsCoordinates(catsCoordinatesProps);
 
@@ -255,12 +254,12 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
       return newKey;
     });
     setIsOpenResults(false);
-    console.log("handleContinue");
+    // console.log("handleContinue");
     
     setCurLevel(curLevel + 1);
   };
   const handleExit = () => {
-    console.log("handleExit");
+    // console.log("handleExit");
     
 
     navigator('/home')

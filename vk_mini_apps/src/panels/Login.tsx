@@ -120,6 +120,13 @@ const Login: React.FC = () => {
             <p className="text-red-500 text-sm mt-4">{errorMessage}</p>
           )}
         </form>
+        <div className="mt-6 text-xs text-center text-gray-600">
+          <p>
+            Если вы лапками промахнулись и случайно удалили аккаунт, то свяжитесь 
+              <a href="https://t.me/nickname_11100" className="text-blue-500 cursor-pointer" > с нашей технической поддержкой </a>
+             для восстановления.
+          </p>
+        </div>
       </div>
     </div>
   );

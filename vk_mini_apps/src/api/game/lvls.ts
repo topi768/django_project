@@ -1,4 +1,4 @@
-import { LevelsData } from "@/types";
+import { LevelsData } from "@/api/types";
 import {  instance } from "../instance";
 
 export const lvlsFetcher = async (): Promise<LevelsData> => {

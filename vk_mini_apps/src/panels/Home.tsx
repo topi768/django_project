@@ -11,6 +11,7 @@ import { ListItem } from "../components/ui/ListItem";
 import { useNavigate } from "react-router-dom";
 import { useGetMyUserId, useGetUserData } from "@/hooks/useUser"; 
 import { useUserStats } from "../hooks/useUser.ts";
+import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
@@ -44,25 +45,28 @@ export const Home: FC<HomeProps> = ({ id }) => {
     achievementsCount: 0,
   };
 const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
+const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
+
   
   useEffect(() => {
     if (userStat) {
       setRankingData(
         [
           {
+            iconName: "top",
+            route: "",
+            text: "Место в рейтинге",
+            value: myPlaceInLearedboard ? myPlaceInLearedboard : 0,
+          },
+          {
             iconName: "score",
             route: "",
             text: "Счет",
             value: userStat.points,
           },
+
           {
-            iconName: "top",
-            route: "",
-            text: "Место в рейтинге",
-            value: value?.userPosition,
-          },
-          {
-            iconName: "score",
+            iconName: "search",
             route: "",
             text: "Найдено котиков",
             value: userStat.countFindCats,
@@ -98,7 +102,7 @@ const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
             <Spacing />
             <div>
               <div className="flex relative my-7 ">
-                <Avatar className="mr-6"  />
+                <Avatar typeBaseAvatar={1} className="mr-6"  />
                 <div className="h-full flex flex-col gap-2">
                   <h3 className="text-[1.0625rem] mt-3 font-bold leading-[1.375rem]">
                     {userData?.name}

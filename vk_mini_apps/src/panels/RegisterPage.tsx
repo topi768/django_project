@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useCountryList, useCitiesList } from "../hooks/useWorldInfo";
 import { useCreateUser, useCreateUserToken } from "../hooks/useUser";
 import InputField from "@/components/ui/inputs/InputField";
-import { RegistrationFormData } from "@/types";
+import { RegistrationFormData } from "@/api/types";
 import {useAuthStore} from '@/store/authStore'
 import { useNavigate } from "react-router-dom";
 

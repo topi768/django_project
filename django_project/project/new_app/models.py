@@ -94,7 +94,7 @@ class UserAccountInfo(models.Model):
     # game
     countFindCats = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
-    rank = models.IntegerField(default=0)
+    rank = models.IntegerField(default=1)
 
     kisKis = models.IntegerField(default=100)
     # Связь с достижениями

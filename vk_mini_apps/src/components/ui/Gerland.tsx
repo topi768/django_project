@@ -10,17 +10,15 @@ import {
 } from "../../assets/icons/baseAvatar/ranksGerland/index";
 
 interface GerlandProps {
-  rank: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  rank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   className: string;
 }
 
-const Gerland: React.FC<GerlandProps> = ({ rank = 1, className = "" }) => {
+const Gerland: React.FC<GerlandProps> = ({ rank, className = "" }) => {
   let IconComponent;
 
   switch (rank) {
-    case 0:
-      IconComponent = IconRanksGerland1;
-      break;
+
     case 1:
       IconComponent = IconRanksGerland1;
       break;
@@ -37,9 +35,11 @@ const Gerland: React.FC<GerlandProps> = ({ rank = 1, className = "" }) => {
       IconComponent = IconRanksGerland5;
       break;
     case 6:
+      
       IconComponent = IconRanksGerland6;
       break;
     case 7:
+      
       IconComponent = IconRanksGerland7;
       break;
     default:

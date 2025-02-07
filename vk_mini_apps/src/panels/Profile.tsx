@@ -1,8 +1,8 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
 import { useNavigate } from "react-router-dom";
 import { EditableText } from "@/components/ui/inputs/EditableText"; 
-import { useGetUserData, useUpdateUserProfile } from "../hooks/useUser.ts";
+import { useDeleteAccount, useGetMyUserId, useGetUserData, useUpdateUserProfile } from "../hooks/useUser.ts";
 import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
 import { Header } from "../components/Header";
@@ -11,19 +11,38 @@ import SelectInput from "@/components/ui/inputs/SelectInput.tsx";
 import InputField from "@/components/ui/inputs/InputField.tsx";
 import { Avatar } from "../components/Avatar";
 import { ListItem } from "@/components/ui/ListItem.tsx";
+import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
 
 export interface ProfileProps extends NavIdProps {}
 
 export const Profile: FC<ProfileProps> = ({ id }) => {
     const mutationUpdateProfile = useUpdateUserProfile();
-    const { data: userData, isLoading, isError, error,refetch: refetchUserData } = useGetUserData(Number(localStorage.getItem("user_id") ));
+    const {data: userId} = useGetMyUserId()
+    const { data: userData, isLoading, isError, error,refetch: refetchUserData } = useGetUserData(userId);
     
     const { data: countryList } = useCountryList();
     const navigate = useNavigate();
-
-    const userDataStorage = localStorage.getItem("user_data");
-    const parsedUserData = userDataStorage ? JSON.parse(userDataStorage) : null;
+    const {mutate: deleteAccount} = useDeleteAccount();
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
+        name: "",
+        country_name: "",
+        country_code:  "Не указано",
+        city:"Не указано",
+        date_of_birth: "Не указано",
+    });
+    useEffect(() => {
+        if (userData) {
+            setFormData({
+                name: userData.name,
+                country_name: countryList?.find((country) => country.country_code === userData.country)?.country_name || "",
+                country_code: userData.country,
+                city: userData.city,
+                date_of_birth: userData.date_of_birth,
+            });
+        }
+    }, [userData, countryList]);
 
     type FormData = {
         name: string;
@@ -32,41 +51,26 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         city: string;
         date_of_birth: string;
     };
-    const [formData, setFormData] = useState<FormData>({
-        name: parsedUserData?.name || "Не указано",
-        country_name: parsedUserData?.country_name || "Не указано",
-        country_code: parsedUserData?.country || "Не указано",
-        city: parsedUserData?.city || "Не указано",
-        date_of_birth: parsedUserData?.date_of_birth || "Не указано",
-    });
+
+
 
     const { data: citiesList } = useCitiesList(formData.country_code);
     const getAgeFromBirthDate = (birthDateString: string): number => {
         const birthDate = new Date(birthDateString);
-
-        if (isNaN(birthDate.getTime())) {
-            return 0; // Возраст не определён
-        }
+        if (isNaN(birthDate.getTime())) return 0; // Возраст не определён
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
-
         const hasHadBirthdayThisYear =
             today.getMonth() > birthDate.getMonth() ||
             (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-
-        if (!hasHadBirthdayThisYear) {
-            age--;
-        }
-        
+        if (!hasHadBirthdayThisYear) age--;
         return age;
     };
 
     const handleSaveProfile = () => {
-        if (!formData.name){
-            
-            
+        if (!formData.name) {
             setErrorMessage("Имя не может быть пустым");
-            return
+            return;
         }
         setErrorMessage("");
         mutationUpdateProfile.mutate({
@@ -80,7 +84,8 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
     };
 
     const handleInputChangeCountry = (e: { value: string; label: string }) => {
-        setFormData({ ...formData, country_name: e.label, country_code: e.value, city: "Не указано" });
+        setFormData({ ...formData, country_name: e.label, country_code: e.value, city: "" });
+        
     };
 
     const handlerInputChangeCity = (e: { value: string; label: string }) => {
@@ -89,6 +94,12 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
 
     const handleInputChangeDate = (e: { target: { value: string } }) => {
         setFormData({ ...formData, date_of_birth: e.target.value });
+    };
+
+    const handleDeleteAccount = () => {
+        deleteAccount();
+        setShowConfirmation(false);
+        navigate("/login");
     };
 
     return (
@@ -109,12 +120,18 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                     <form>
                         <SelectInput
                             label="Страна"
-                            defaultValue={{ label: formData.country_name, value: "RU" }}
+                            defaultValue={
+                                {
+                                    value: formData.country_code,
+                                    label: formData.country_name
+                                }
+                            }
                             value={formData.country_name}
                             options={countryList?.map((country) => ({
                                 value: country.country_code,
                                 label: country.country_name,
                             }))}
+                            
                             onChange={handleInputChangeCountry}
                         />
 
@@ -126,6 +143,11 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                                 label: city.city,
                             }))}
                             onChange={handlerInputChangeCity}
+                            defaultValue={
+                                {
+                                value: formData.city,
+                                label: formData.city
+                            }}
                         />
                         <InputField
                             label={"Дата рождения"}
@@ -148,7 +170,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                 </div>
 
                 {/* Отображение статуса */}
-                <div className="mt-4">
+                <div className="my-4 text-center">
                     {mutationUpdateProfile.status === "pending" && (
                         <p className="text-blue-500">Обновление данных...</p>
                     )}
@@ -160,6 +182,38 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                     )}
                     {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                 </div>
+
+                {/* Кнопка удаления с подтверждением */}
+                <LargeButton
+                    onClick={() => setShowConfirmation(true)}
+                    text="Удалить аккаунт"
+                    isPrimary={false}
+                    className="bg-red-500 text-white transition-all duration-300 ease-in-out hover:bg-red-600 active:bg-red-700 shadow-md"
+                />
+
+                {/* Модальное окно подтверждения */}
+                {showConfirmation && (
+                    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-1/3">
+                            <h2 className="text-base font-semibold text-center mb-1">{'Нам жалко терять такого котика как Вы :('}</h2>
+                            <h2  className="text-base font-semibold text-center mb-4"> Уверены, что хотите удалить аккаунт?</h2>
+                            <div className="flex justify-around">
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition-all"
+                                >
+                                    Да, удалить
+                                </button>
+                                <button
+                                    onClick={() => setShowConfirmation(false)}
+                                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition-all"
+                                >
+                                    Отмена
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <Footer />

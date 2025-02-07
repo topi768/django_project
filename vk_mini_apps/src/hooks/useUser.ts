@@ -1,6 +1,6 @@
-import { useQuery, useMutation, UseMutationResult  } from "@tanstack/react-query";
-import { getUserDataByIdFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher, getMyUserId } from "../api/appInfo/user";
-import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/types";
+import { useQuery, useMutation, UseMutationResult, useQueryClient   } from "@tanstack/react-query";
+import { getUserDataByIdFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher, getMyUserId, deleteAccountFetcher } from "../api/appInfo/user";
+import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/api/types";
 import { useState } from "react";
 import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
 import {loginUserFetcher} from "@/api/appInfo/user"
@@ -94,14 +94,10 @@ export const useUpdateUserProfile = (): UseMutationResult<
 };
 
 
-export const useUserStats = (userId: number | undefined) => {
+export const useUserStats = () => {
   return useQuery({
-    queryKey: ["userStats", userId],
-    queryFn: () => {
-      if (userId === undefined) return Promise.reject("User ID is undefined");
-      return getUserStatsFetcher(userId);
-    },
-    enabled: !!userId, // Не запрашивать, если userId = undefined
+    queryKey: ["userStats"],
+    queryFn: () => getUserStatsFetcher(),
   });
 };
 
@@ -127,3 +123,15 @@ export const useGetMyUserId = () => {
     queryFn: () => getMyUserId(),
   });
 };
+export const useDeleteAccount = () => {
+  const queryClient = useQueryClient(); 
+
+  return useMutation({
+    mutationFn: () => deleteAccountFetcher(),
+    onSuccess: () => {
+      queryClient.clear(); // Очищает весь кэш (все данные)
+      localStorage.clear(); // Удаляет все данные из localStorage
+      sessionStorage.clear(); // Очищает sessionStorage, где хранятся токены
+    },
+  });
+}

@@ -21,6 +21,8 @@ urlpatterns = [
     path('achievements/', views.get_all_achievements, name='get_all_achievements'),
     path('api/my-achievements/', views.get_my_achievements, name='get_my_achievements'),
 
+    # path('api/get-my-rank/', views.get_my_rank, name='get_my_rank'),
+
     path("get-user-stats/", views.get_user_stats, name="get_user_stats"),
     path("api/get-user-id-by-email/<str:email>/", views.getUser_idByEmail, name="get_user_id_by_email"),
     path("api/delete-user-soft/", views.delete_account_soft, name="delete_user_soft"),

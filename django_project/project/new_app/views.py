@@ -129,10 +129,10 @@ RANKS = [
     {"name": "Сержант Кискисенко", "min_points": 0},
     {"name": "Исследователь", "min_points": 100},
     {"name": "Охотник", "min_points": 200},
-    {"name": "Мастер Котов", "min_points": 300},
-    {"name": "Легенда Котов", "min_points": 500},
-    {"name": "Кото-Бог", "min_points": 700},
-    {"name": "Великий Кото-Властелин", "min_points": 1000},
+    {"name": "Мастер Котов", "min_points": 500},
+    {"name": "Легенда Котов", "min_points": 1000},
+    {"name": "Кото-Бог", "min_points": 1700},
+    {"name": "Великий Кото-Властелин", "min_points": 3200},
 ]
 
 @api_view(['POST'])
@@ -150,14 +150,22 @@ def add_points(request):
         user_info.points += increment_value
 
         user_info.save()
-
+        # 
+        if user_info.rank < len(RANKS):
+            for i, rank in enumerate(RANKS, start=0):
+                if int(user_info.points) >= int(rank['min_points']):
+                    user_info.rank = i + 1
+        user_info.save()
+        
         return Response({
-            "message": "FindCats updated successfully",
+            "message": "points updated successfully",
+
         }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Путь доступен всем
@@ -207,18 +215,26 @@ def get_my_achievements(request):
 @permission_classes([IsAuthenticated]) 
 def get_user_stats(request):
     try:
-        print("111")
         user_id =  request.user.id
         
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
-        
+        # Определяем имя ранга
+        rank_name = None
+        if 0 <= user_info.rank < len(RANKS):
+            rank_name = RANKS[user_info.rank - 1]["name"]
+
+
         # Возвращаем статистику пользователя
         return Response({
             "message": "User stats retrieved successfully",
             "countFindCats": user_info.countFindCats,
             "points": user_info.points,
-            "kisKis": user_info.kisKis
+            "kisKis": user_info.kisKis,
+            "rank": user_info.rank,
+            "rank_name": rank_name
+
+            
         }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
