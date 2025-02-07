@@ -6,7 +6,7 @@ import { Spacing } from "../components/ui/Spacing";
 import { Avatar } from "../components/Avatar";
 import { Footer } from "../components/Footer";
 import { useGetLeaderboard } from "@/hooks/useLeaderboard";
-import { LeaderboardList } from "@/api/types";
+import { LeaderboardList, RanksNumber } from "@/api/types";
 
 // Статичные данные вместо useGetRatingTop5
 
@@ -19,7 +19,7 @@ export const ScoreList: FC<ScoreListProps> = ({ id }) => {
   interface Friend {
     name: string;
     avatar: string;
-    rank: string;
+    rank: RanksNumber;
     score: number;
   }
   const {data: leaderboardList} = useGetLeaderboard();
@@ -57,7 +57,7 @@ export const ScoreList: FC<ScoreListProps> = ({ id }) => {
             topList.map((friend, index) => (
               <div key={index} className="">
                 <div className="flex relative my-3">
-                  <Avatar className="mr-6"  />
+                  <Avatar className="mr-6" typeRank={friend.rank} />
                   <div className="h-full flex flex-col gap-2">
                     <h3 className="text-[1.0625rem] mt-3 font-bold leading-[1.375rem]">
                       {friend.name}

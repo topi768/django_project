@@ -73,15 +73,17 @@ export type LeaderboardUser = {
   id: number;
   name: string;
   points: number;
-  rank: number;
+  rank: RanksNumber;
 }
 export type LeaderboardList = LeaderboardUser[];
 
+export type RanksNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 
 export interface UserStats {
   countFindCats: number;
   kisKis: number;
   points: number;
-  rank: number;
+  rank: RanksNumber;
   rank_name: string;
   
 }
+

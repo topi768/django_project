@@ -4,6 +4,9 @@ import IconAchievements from "@/assets/icons/achievements.svg";
 import IconBalance from "@/assets/icons/balance.svg";
 import IconFriends from "@/assets/icons/friends.svg";
 import { Avatar } from "../components/Avatar";
+import { useEffect, useState } from "react";
+import { useUserStats } from "@/hooks/useUser";
+import { RanksNumber } from "@/api/types";
 
 interface FooterProps {
   className?: string;
@@ -11,7 +14,15 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ className }) => {
   const navigate = useNavigate(); // Для навигации
-
+  const {data: userStats} = useUserStats()
+  const [rankNumber, setRankNumber] = useState<RanksNumber>(1)
+  useEffect (() => {
+    if (userStats) {
+      
+      setRankNumber(userStats.rank)
+      
+    }
+  }, [userStats])
   return (
     <footer
       className={`px-6 w-full text-[10px] md:text-[16px] flex justify-center absolute bottom-4 left-0 ${className}`}
@@ -31,7 +42,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
           <IconAchievements className="text-black w-8 h-8 md:w-10 md:h-10" />
           <p className="absolute left-1/2 -translate-x-1/2">Достижения</p>
         </div>
-        <Avatar typeRank={Number(localStorage.getItem("completedAchievements"))} className="md:w-12 md:h-12 cursor-pointer" onClick={() => navigate(`/users/${localStorage.getItem("user_id")}`)}  />
+        <Avatar typeRank={rankNumber} className="md:w-12 md:h-12 cursor-pointer" onClick={() => navigate(`/users/${localStorage.getItem("user_id")}`)}  />
         <div
           className="relative cursor-pointer"
           onClick={() => navigate("/Friends")} // Используем navigate для перехода

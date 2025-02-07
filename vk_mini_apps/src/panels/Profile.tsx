@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { Panel, NavIdProps } from "@vkontakte/vkui";
 import { useNavigate } from "react-router-dom";
 import { EditableText } from "@/components/ui/inputs/EditableText"; 
-import { useDeleteAccount, useGetMyUserId, useGetUserData, useUpdateUserProfile } from "../hooks/useUser.ts";
+import { useDeleteAccount, useGetMyUserId, useGetUserData, useUpdateUserProfile, useUserStats } from "../hooks/useUser.ts";
 import { useCitiesList, useCountryList } from "../hooks/useWorldInfo.ts";
 import { LargeButton } from "../components/ui/buttons/LargeButton";
 import { Header } from "../components/Header";
@@ -101,6 +101,16 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         setShowConfirmation(false);
         navigate("/login");
     };
+      const {data: userStats} = useUserStats()
+      const [rankNumber, setRankNumber] = useState(0)
+      useEffect (() => {
+        if (userStats) {
+          console.log(userStats.rank)
+          
+          setRankNumber(userStats.rank)
+          
+        }
+      }, [userStats])
 
     return (
         <Panel id={id}>
@@ -108,7 +118,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                 <Header text="Профиль" />
                 <div>
                     <div className="flex relative my-7">
-                        <Avatar className="mr-6"  />
+                        <Avatar typeRank={rankNumber} className="mr-6"  />
                         <div className="h-full flex flex-col gap-2 w-full">
                             <EditableText
                                 name={formData.name}

@@ -1,4 +1,5 @@
 // DynamicRankIcon.tsx
+import { RanksNumber } from "@/api/types";
 import {
   IconRanksGerland1,
   IconRanksGerland2,
@@ -10,7 +11,7 @@ import {
 } from "../../assets/icons/baseAvatar/ranksGerland/index";
 
 interface GerlandProps {
-  rank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  rank: RanksNumber;
   className: string;
 }
 
@@ -44,7 +45,7 @@ const Gerland: React.FC<GerlandProps> = ({ rank, className = "" }) => {
       break;
     default:
       // console.warn(`Invalid rank value: ${rank}`);
-      IconComponent = IconRanksGerland7;
+      IconComponent = IconRanksGerland1;
       // return null;
       break;
   }

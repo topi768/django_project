@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useGetMyUserId, useGetUserData } from "@/hooks/useUser"; 
 import { useUserStats } from "../hooks/useUser.ts";
 import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
+import { RanksNumber } from "@/api/types.ts";
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
@@ -20,7 +21,7 @@ export const Home: FC<HomeProps> = ({ id }) => {
   const {data: userId} = useGetMyUserId()
 
   const { data: userData, isLoading, isError, error, refetch: refetchUserData } = useGetUserData(userId);
-  const { data: userStat, refetch} = useUserStats(userId);
+  const { data: userStat, refetch} = useUserStats();
 
   interface RankingDataItem {
     iconName: string;
@@ -38,6 +39,7 @@ export const Home: FC<HomeProps> = ({ id }) => {
     }
   }, [userData]);
 
+
   const value = {
     score: 0,
     userPosition: 0,
@@ -47,7 +49,6 @@ export const Home: FC<HomeProps> = ({ id }) => {
 const [rankingData, setRankingData] = useState<RankingDataItem[]>([]);
 const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
 
-  
   useEffect(() => {
     if (userStat) {
       setRankingData(
@@ -56,7 +57,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
             iconName: "top",
             route: "",
             text: "Место в рейтинге",
-            value: myPlaceInLearedboard ? myPlaceInLearedboard : 0,
+            value: myPlaceInLearedboard ??  0,
           },
           {
             iconName: "score",
@@ -82,14 +83,23 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
         ]
       )
     }
-  }, [userStat]);
+  }, [userStat, myPlaceInLearedboard]);
 
   useEffect(() => {
     // Обновление данных при монтировании компонента или возврате на страницу
     refetch();
   }, [refetch]);
 
-
+  const {data: userStats} = useUserStats()
+  const [rankNumber, setRankNumber] = useState<RanksNumber>(1)
+  useEffect (() => {
+    if (userStats) {
+      console.log(userStats)
+      
+      setRankNumber(userStats.rank)
+      
+    }
+  }, [userStats])
 
 
   return (
@@ -102,7 +112,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
             <Spacing />
             <div>
               <div className="flex relative my-7 ">
-                <Avatar typeBaseAvatar={1} className="mr-6"  />
+                <Avatar typeBaseAvatar={1} typeRank={rankNumber} className="mr-6"  />
                 <div className="h-full flex flex-col gap-2">
                   <h3 className="text-[1.0625rem] mt-3 font-bold leading-[1.375rem]">
                     {userData?.name}
