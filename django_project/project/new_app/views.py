@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound
-from .models import UserAccountInfo
+from .models import Ranks, UserAccountInfo
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,9 +12,10 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import permission_classes
 from .models import ImageWithCoordinates
 from .serializers import ImageWithCoordinatesSerializer
+from django.db import transaction
 
 class UserAccountInfoView(APIView):
-    def put(self, request, *args, **kwargs):
+    def put(self, request):
         # Получаем email из параметров запроса
         email = request.data.get('email')
         if not email:
@@ -31,9 +32,10 @@ class UserAccountInfoView(APIView):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-def get_user_account_info(request, user_id):
+@permission_classes([IsAuthenticated])
+def get_user_account_info(request, user_id ):
     try:
+        
         user_account_info = UserAccountInfo.objects.get(user_id=user_id)
 
     except:
@@ -96,27 +98,27 @@ def get_levels(request):
     return Response(serializer.data)
 
 
+from django.db.models import F
 
 
 @api_view(['POST'])
 def add_find_cats(request):
     try:
         user = request.user
-        user_id = user.id
-        increment_value = int(request.data.get('increment', 1))  # Если не передано, увеличиваем на 1 по умолчанию
+        increment_value = int(request.data.get('increment', 1))
 
-        user_info = UserAccountInfo.objects.get(user_id=user_id)
-        user_info.countFindCats += increment_value
-        user_info.save()
-        # 
-        # Проверяем, может ли пользователь получить новые достижения
-        achievements = list(Achievement.objects.all())
-        for ach in achievements:
-            if user_info.countFindCats >= ach.maxProgress:
-                user_info.achievements.add(ach)
-                user_info.save()
-            else:
-                print(f"{user_info.countFindCats} не достигает {ach.maxProgress}")
+        with transaction.atomic():
+            # Атомарное обновление поля countFindCats
+            UserAccountInfo.objects.filter(user_id=user.id).update(
+                countFindCats=F('countFindCats') + increment_value
+            )
+            # Перезагружаем объект, чтобы получить актуальное значение
+            user_info = UserAccountInfo.objects.select_for_update().get(user_id=user.id)
+
+
+            for ach in Achievement.objects.all():
+                if user_info.countFindCats >= ach.maxProgress:
+                    user_info.achievements.add(ach)
 
         return Response({
             "message": "FindCats updated successfully", 
@@ -124,48 +126,41 @@ def add_find_cats(request):
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
-RANKS = [
-    {"name": "Сержант Кискисенко", "min_points": 0},
-    {"name": "Исследователь", "min_points": 100},
-    {"name": "Охотник", "min_points": 200},
-    {"name": "Мастер Котов", "min_points": 500},
-    {"name": "Легенда Котов", "min_points": 1000},
-    {"name": "Кото-Бог", "min_points": 1700},
-    {"name": "Великий Кото-Властелин", "min_points": 3200},
-]
-
 @api_view(['POST'])
 def add_points(request):
     try:
         user = request.user
-        user_id = user.id
-        # Извлекаем количество, на которое нужно увеличить количество найденных котов
-        increment_value = int( request.data.get('increment', 1))  # Если не передано, увеличиваем на 1 по умолчанию
+        increment_value = int(request.data.get('increment', 1))
 
-        # Получаем пользователя
-        user_info = UserAccountInfo.objects.get(user_id=user_id)
-        
-        # Добавляем переданное количество найденных котов
-        user_info.points += increment_value
+        with transaction.atomic():
+            # Атомарное обновление поля points
+            UserAccountInfo.objects.filter(user_id=user.id).update(
+                points=F('points') + increment_value
+            )
+            # Перезагружаем объект для получения актуального значения points
+            user_info = UserAccountInfo.objects.select_for_update().get(user_id=user.id)
 
-        user_info.save()
-        # 
-        if user_info.rank < len(RANKS):
-            for i, rank in enumerate(RANKS, start=0):
-                if int(user_info.points) >= int(rank['min_points']):
-                    user_info.rank = i + 1
-        user_info.save()
-        
+            # Получаем список рангов (убедитесь, что объекты рангов отсортированы по min_points)
+            ranks_objects = Ranks.objects.all().order_by('min_points')
+            new_rank_id = user_info.rank_id  # по умолчанию оставляем текущий ранг
+            # Перебираем ранги и находим тот, для которого points удовлетворяют условию
+            for rank in ranks_objects:
+                if user_info.points >= rank.min_points:
+                    new_rank_id = rank.rank_number  # предположим, что поле rank_number соответствует значению ранга
+                else:
+                    break
+
+            # Обновляем ранг, если он изменился
+            if new_rank_id != user_info.rank_id:
+                user_info.rank_id = new_rank_id
+                user_info.save()
+
         return Response({
             "message": "points updated successfully",
-
         }, status=status.HTTP_200_OK)
     
     except UserAccountInfo.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Путь доступен всем
@@ -186,7 +181,6 @@ def get_all_achievements(request):
 def get_my_achievements(request):
     try:
         user_id = request.user.id
-        print(user_id)
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
         count_find_cats = user_info.countFindCats
@@ -220,9 +214,10 @@ def get_user_stats(request):
         # Получаем информацию о пользователе
         user_info = UserAccountInfo.objects.get(user_id=user_id)
         # Определяем имя ранга
-        rank_name = None
-        if 0 <= user_info.rank < len(RANKS):
-            rank_name = RANKS[user_info.rank - 1]["name"]
+        
+        # rank_name = None
+        # if 0 <= user_info.rank < len(RANKS):
+        #     rank_name = RANKS[user_info.rank - 1]["name"]
 
 
         # Возвращаем статистику пользователя
@@ -231,8 +226,8 @@ def get_user_stats(request):
             "countFindCats": user_info.countFindCats,
             "points": user_info.points,
             "kisKis": user_info.kisKis,
-            "rank": user_info.rank,
-            "rank_name": rank_name
+            "rank": user_info.rank_id,
+            "rank_name": user_info.rank.name
 
             
         }, status=status.HTTP_200_OK)

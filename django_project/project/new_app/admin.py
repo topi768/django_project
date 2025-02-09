@@ -4,7 +4,7 @@ from django import forms
 from django.forms import widgets
 
 from geography.models import CountryCodeAndCountryName
-from .models import ImageWithCoordinates, Achievement, UserAccount, UserAccountInfo
+from .models import ImageWithCoordinates, Achievement, Ranks, UserAccount, UserAccountInfo
 
 # Кастомная форма для пользователя, если хотите изменить или добавить поля
 class UserAccountForm(forms.ModelForm):
@@ -130,3 +130,11 @@ class ImageWithCoordinatesAdmin(admin.ModelAdmin):
 
     class Media:
         js = ('admin/js/image_preview.js',)  # Скрипт для предпросмотра изображений
+
+    
+@admin.register(Ranks)
+class RanksAdmin(admin.ModelAdmin):
+    list_display = ('name', 'min_points', 'rank_number')
+    search_fields = ('name',)
+    list_filter = ('rank_number',)
+    

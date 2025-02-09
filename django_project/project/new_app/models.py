@@ -94,8 +94,13 @@ class UserAccountInfo(models.Model):
     # game
     countFindCats = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
-    rank = models.IntegerField(default=1)
-
+    rank = models.ForeignKey(
+            "Ranks",
+            on_delete=models.SET_DEFAULT,
+            default=1,  # Убедитесь, что ранг с rank_number=1 существует
+            related_name="users",
+            to_field="rank_number"  # Ссылаемся на поле rank_number в Ranks
+        )
     kisKis = models.IntegerField(default=100)
     # Связь с достижениями
     achievements = models.ManyToManyField(Achievement, related_name="users", blank=True)
@@ -106,8 +111,11 @@ class UserAccountInfo(models.Model):
         return f"Account info for {self.user.email}"
 
 
+class Ranks(models.Model):
+    rank_number = models.IntegerField(unique=True)
 
-
+    name = models.CharField(max_length=255)  # Название ранга
+    min_points = models.IntegerField()
 
 class ImageWithCoordinates(models.Model):
     image = models.ImageField(upload_to='images/')  # Поле для хранения пути к изображению
