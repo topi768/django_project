@@ -13,6 +13,7 @@ import { useGetMyUserId, useGetUserData } from "@/hooks/useUser";
 import { useUserStats } from "../hooks/useUser.ts";
 import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
 import { RanksNumber } from "@/api/types.ts";
+import { useUserAchievements } from "@/hooks/game/useGameUserInfo.tsx";
 export interface HomeProps extends NavIdProps {
   fetchedUser?: UserInfo;
 }
@@ -22,7 +23,7 @@ export const Home: FC<HomeProps> = ({ id }) => {
 
   const { data: userData, isLoading, isError, error, refetch: refetchUserData } = useGetUserData(userId);
   const { data: userStat, refetch} = useUserStats();
-
+  const {data: myAchievementList} = useUserAchievements()
   interface RankingDataItem {
     iconName: string;
     route: string;
@@ -76,7 +77,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
             iconName: "achievements",
             route: "",
             text: "Открыто достижений",
-            value: value?.achievementsCount,
+            value: myAchievementList?.length ?? 0,
           }
           
         
@@ -118,7 +119,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
                     {userData?.name}
                   </h3>
                   <p className="text-[#8484f0] leading-[1.125rem]">
-                    {"Сержант Кискисенко "}
+                    {userStat?.rank_name}
                   </p>
                 </div>
               </div>
@@ -156,7 +157,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
           </div>
         </div>
         
-        <Footer />
+        {/* <Footer /> */}
       </Panel>
     </>
   );

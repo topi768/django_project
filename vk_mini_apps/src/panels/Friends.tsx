@@ -88,7 +88,7 @@ export const Friends: FC<FriendsProps> = ({ id }) => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </Panel>
   );
 };

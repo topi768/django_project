@@ -1,4 +1,4 @@
-import { apiUrls, instance } from "../instance";
+import {  instance } from "../instance";
 import { Country, City } from '../types';
 
 

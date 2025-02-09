@@ -12,6 +12,7 @@ import { usePlayerStore } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIncrementFindCats, useIncrementPoints } from "@/hooks/game/useGameUserInfo";
+import { useUserStats } from "@/hooks/useUser";
 
 const portal = document.getElementById("portal")!;
 
@@ -36,10 +37,10 @@ export const Results: React.FC<ResultsProps> = ({
   const { mutate: incrementPoints } = useIncrementPoints();
   const { mutate: incrementFindCats } = useIncrementFindCats();
   const navigate = useNavigate();
-  const rang = usePlayerStore((state) => state.rang);
   const [isFailedeGame, setIsFailedeGame] = useState(false);
   const [points, setPoints] = useState(0);
   const routeNavigator = useRouteNavigator();
+  const { data: userStat} = useUserStats();
 
   // Флаг для того, чтобы вызвать incrementPoints и incrementFindCats только один раз
   const hasIncrementedRef = useRef(false);
@@ -85,10 +86,10 @@ export const Results: React.FC<ResultsProps> = ({
         <div className="relative w-full h-full flex justify-center max-w-[800px] items-center">
           <div className="text-center font-[18px] bg-white px-7 py-10 rounded-2xl relative w-full">
             <div className="mb-2">
-              <Avatar className="absolute -top-[40px] left-1/2 -translate-x-1/2" />
-              <p>Уровень 1</p>
-              <p className="text-primary">{rang}</p>
-              <ProgressBar current={results.amountCat} max={10} />
+              <Avatar typeRank={userStat?.rank} className="absolute -top-[40px] left-1/2 -translate-x-1/2" />
+              <p>Уровень {userStat?.rank}</p>
+              <p className="text-primary">{userStat?.rank_name}</p>
+              {/* <ProgressBar current={results.amountCat} max={10} /> */}
             </div>
 
             <Spacing />

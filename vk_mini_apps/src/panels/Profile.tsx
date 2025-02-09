@@ -12,6 +12,7 @@ import InputField from "@/components/ui/inputs/InputField.tsx";
 import { Avatar } from "../components/Avatar";
 import { ListItem } from "@/components/ui/ListItem.tsx";
 import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
+import { RanksNumber } from "@/api/types.ts";
 
 export interface ProfileProps extends NavIdProps {}
 
@@ -51,6 +52,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         city: string;
         date_of_birth: string;
     };
+    const { data: userStat, refetch} = useUserStats();
 
 
 
@@ -102,7 +104,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
         navigate("/login");
     };
       const {data: userStats} = useUserStats()
-      const [rankNumber, setRankNumber] = useState(0)
+      const [rankNumber, setRankNumber] = useState<RanksNumber>(1)
       useEffect (() => {
         if (userStats) {
           console.log(userStats.rank)
@@ -124,7 +126,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                                 name={formData.name}
                                 onSave={(newName) => setFormData({ ...formData, name: newName })}
                             />
-                            <p className="text-[#8484f0] leading-[1.125rem]">{"Сержант Кискисенко"}</p>
+                            <p className="text-[#8484f0] leading-[1.125rem]">{userStat?.rank_name}</p>
                         </div>
                     </div>
                     <form>
@@ -226,7 +228,7 @@ export const Profile: FC<ProfileProps> = ({ id }) => {
                 )}
             </div>
 
-            <Footer />
+            {/* <Footer /> */}
         </Panel>
     );
 };

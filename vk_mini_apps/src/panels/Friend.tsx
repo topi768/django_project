@@ -71,7 +71,7 @@ export const Friend: FC<FriendProps> = ({ id }) => {
         </div>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
     </Panel>
   );
 };

@@ -114,7 +114,7 @@ export const Achievements: FC<AchievementsProps> = ({ id }) => {
           </div>
         ))}
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </Panel>
   );
 };

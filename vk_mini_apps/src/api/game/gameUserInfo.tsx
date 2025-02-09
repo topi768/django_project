@@ -48,6 +48,7 @@ export const getMyAchievementsFetcher = async (): Promise<MyAchievement[]> => {
 export const getUserStatsFetcher = async (): Promise<UserStats> => {
   try {
     const response = await instanceWithJWT.get(`/get-user-stats/`); // URL для получения статистики
+    console.log(response.data);
     
     return response.data; // Возвращаем данные статистики
   } catch (error) {

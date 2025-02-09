@@ -83,7 +83,7 @@ export const ScoreList: FC<ScoreListProps> = ({ id }) => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </Panel>
   );
 };

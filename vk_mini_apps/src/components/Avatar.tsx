@@ -10,7 +10,7 @@ interface AvatarProps {
   srcImage?: string;
   className?: string;
   typeBaseAvatar?: number;
-  typeRank: RanksNumber;
+  typeRank?: RanksNumber;
   link?: string;
   onClick?: () => void;
 }
@@ -24,7 +24,14 @@ export const Avatar: React.FC<AvatarProps> = ({
   onClick,
 }) => {
   const navigate = useNavigate();
+  const [baseRank, setBaseRank] = useState<RanksNumber>(1);
 
+  // const { data: userStats } = useUserStats();
+  // useEffect(() => {
+  //   if (userStats) {
+  //     setBaseRank(userStats.rank);
+  //   }
+  // }, [userStats]);
   let BaseAvatar;
 
   switch (typeBaseAvatar) {
@@ -58,7 +65,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
           <Gerland
             className="absolute bottom-[-7px] -translate-x-[1px]"
-            rank={typeRank}
+            rank={typeRank ? typeRank : baseRank}
           />
         </div>
       </div>

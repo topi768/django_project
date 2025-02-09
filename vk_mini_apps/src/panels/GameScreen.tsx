@@ -17,6 +17,7 @@ import {
 import { ImgGame } from "../components/GameScreen/Img";
 import { useNavigate } from "react-router-dom";
 import { useGetLvls } from "@/hooks/game/useGetLvls";
+import { useAuthStore } from "@/store/authStore";
 
 export interface OnboardingProps extends NavIdProps {
   fetchedUser?: UserInfo;
@@ -57,6 +58,7 @@ export const GameScreen: FC<OnboardingProps> = ({ id }) => {
   const [catsCoords, setCatsCoordinates] = useState<Cat[]>([
   ]);
   const { data: levels, isLoading : isGetLvlsLoading } = useGetLvls();
+
 
   useEffect(() => {
     if (levels) {

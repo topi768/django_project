@@ -45,7 +45,7 @@ export const СurrencyPurchase: FC<СurrencyPurchaserops> = ({ id }) => {
           isWithWatchIcon={true}
           className="mt-4"
         />
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </Panel>
   );

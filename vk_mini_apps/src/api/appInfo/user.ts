@@ -19,7 +19,7 @@ export const authTokenFetcher = async (userData: UserDataForToken) => {
   }
 
 export const getUserDataByIdFetcher = async (user_id: number): Promise<UserData>  => {
-  const response = await instance.get('api/user-account-info/' + user_id);
+  const response = await instanceWithJWT.get('api/user-account-info/' + user_id);
   
   return response.data;
 }
