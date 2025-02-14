@@ -270,3 +270,20 @@ def get_my_palce_in_ranking(request):
         return Response(rank, status=status.HTTP_200_OK)
     except ValueError:
         return Response({"error": "User not found in ranking"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_my_kisKis(request):
+    user = request.user
+    user_info = UserAccountInfo.objects.get(user=user)
+    return Response({"kisKis": user_info.kisKis}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  
+def add_kis_kis(request):
+    incrementCount = int(request.data.get('increment', 1))
+    user = request.user
+    user_info = UserAccountInfo.objects.get(user=user)
+    user_info.kisKis += incrementCount
+    user_info.save()
+    return Response({"kisKis": user_info.kisKis}, status=status.HTTP_200_OK)

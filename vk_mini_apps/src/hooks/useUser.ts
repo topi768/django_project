@@ -1,5 +1,5 @@
 import { useQuery, useMutation, UseMutationResult, useQueryClient   } from "@tanstack/react-query";
-import { getUserDataByIdFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher, getMyUserId, deleteAccountFetcher } from "../api/appInfo/user";
+import { getUserDataByIdFetcher, createUserFetcher, authTokenFetcher, updateUserFetcher, getMyUserId, deleteAccountFetcher, addKisKisFetcher } from "../api/appInfo/user";
 import {RegistrationFormData, UserDataForToken, UserData, UpdateProfileData} from "@/api/types";
 import { useState } from "react";
 import { getUserStatsFetcher } from "@/api/game/gameUserInfo";
@@ -133,5 +133,11 @@ export const useDeleteAccount = () => {
       localStorage.clear(); // Удаляет все данные из localStorage
       sessionStorage.clear(); // Очищает sessionStorage, где хранятся токены
     },
+  });
+}
+
+export const useAddKisKis = () => {
+  return useMutation({
+    mutationFn: (incrementCount: number) => addKisKisFetcher(incrementCount),
   });
 }

@@ -7,13 +7,13 @@ export const incrementFindCatsFetcher = async (incrementCats: number): Promise<a
   const response = await instanceWithJWT.post(`/add-findcats/`, {
     increment: incrementCats, 
   });
-  console.log(incrementCats);
+  // console.log(incrementCats);
   
   return response.data;
 };
 
 export const incrementPointsFetcher = async (incrementPoints: number): Promise<any> => {
-  console.log(incrementPoints);
+  // console.log(incrementPoints);
 
   // Отправляем данные в теле запроса, правильно указывая параметр 'increment'
   const response = await instanceWithJWT.post(`/add-points/`, {
@@ -48,7 +48,7 @@ export const getMyAchievementsFetcher = async (): Promise<MyAchievement[]> => {
 export const getUserStatsFetcher = async (): Promise<UserStats> => {
   try {
     const response = await instanceWithJWT.get(`/get-user-stats/`); // URL для получения статистики
-    console.log(response.data);
+    // console.log(response.data);
     
     return response.data; // Возвращаем данные статистики
   } catch (error) {

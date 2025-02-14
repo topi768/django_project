@@ -28,6 +28,8 @@ urlpatterns = [
     path("api/delete-user-soft/", views.delete_account_soft, name="delete_user_soft"),
 
     path('api/get_leaderboard/', views.get_leaderboard, name='get_leaderboard'),
-    path('api/get-my-place-in-ranking', views.get_my_palce_in_ranking, name="get_my_palce_in_ranking" )
+    path('api/get-my-place-in-ranking', views.get_my_palce_in_ranking, name="get_my_palce_in_ranking" ),
+    path('api/get-my-kis-kis', views.get_my_kisKis, name="get_my_kisKis"),
+    path('api/add-kis-kis', views.add_kis_kis, name="add_kis_kis"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

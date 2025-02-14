@@ -44,3 +44,7 @@ export const deleteAccountFetcher = async () => {
   const response = await instanceWithJWT.post('api/delete-user-soft/');
   return response.data;
 }
+export const addKisKisFetcher = async (incrementCount: number) => {
+  const response = await instanceWithJWT.post('api/add-kis-kis', {increment: incrementCount});
+  return response.data;
+}

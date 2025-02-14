@@ -85,5 +85,6 @@ export interface UserStats {
   rank: RanksNumber;
   rank_name: string;
   
+  
 }
 
