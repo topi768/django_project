@@ -9,7 +9,7 @@ import { Footer } from "../components/Footer";
 import { TimerReverse } from "../components/TimerReverse";
 import { ListItem } from "../components/ui/ListItem";
 import { useNavigate } from "react-router-dom";
-import { useGetMyUserId, useGetUserData } from "@/hooks/useUser"; 
+import { useAddKisKis, useGetMyUserId, useGetUserData } from "@/hooks/useUser"; 
 import { useUserStats } from "../hooks/useUser.ts";
 import { useGetMyPlaceInLeaderboard } from "@/hooks/useLeaderboard.ts";
 import { RanksNumber } from "@/api/types.ts";
@@ -20,6 +20,7 @@ export interface HomeProps extends NavIdProps {
 
 export const Home: FC<HomeProps> = ({ id }) => {
   const {data: userId} = useGetMyUserId()
+  const { mutate: removeKisKis } = useAddKisKis();
 
   const { data: userData, isLoading, isError, error, refetch: refetchUserData } = useGetUserData(userId);
   const { data: userStat, refetch} = useUserStats();
@@ -103,6 +104,11 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
   }, [userStats])
 
 
+  const handleStartGame = () => {
+    removeKisKis(-10)
+    navigate("/GameScreen")
+  }
+
   return (
     <>
       <Panel id={id}>
@@ -140,10 +146,10 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
               <LargeButton
                 className=""
                 text={"Играть за 10 кис-кисов"}
-                onClick={() => navigate("/GameScreen")}
+                onClick={handleStartGame}
               />
               <div className="flex justify-center text-primary">
-                <p>или через </p>
+                {/* <p>или через </p>
                 <TimerReverse
                   isPause={false}
                   startTime={86400}
@@ -151,7 +157,7 @@ const {data: myPlaceInLearedboard} = useGetMyPlaceInLeaderboard()
                     console.log("onEnd timer");
                   }}
                   className="ml-3"
-                />
+                /> */}
               </div>
             </div>
           </div>
