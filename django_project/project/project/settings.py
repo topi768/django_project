@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     #  'new_app.apps.MyAppConfig',
     'new_app',
-    'geography'
+    'geography',
+    'bugreport',
 ]
 
 MIDDLEWARE = [
